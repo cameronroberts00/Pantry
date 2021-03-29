@@ -47,14 +47,14 @@ public class Recipes extends Fragment {
 
             loadData();
             buildRecyclerView();
-            setInsertButton();
-            Button buttonSave = view.findViewById(R.id.button_save);
+           // setInsertButton();
+          /* Button buttonSave = view.findViewById(R.id.button_save);
             buttonSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     saveData();
                 }
-            });
+            });*/
         return view;
         }
 
@@ -88,7 +88,7 @@ public class Recipes extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
     }
-    private void setInsertButton() {
+ /*   private void setInsertButton() {
         Button buttonInsert = view.findViewById(R.id.button_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,12 +98,12 @@ public class Recipes extends Fragment {
                 insertItem(line1.getText().toString(), line2.getText().toString());
             }
         });
-    }
+    }*/
     //Going to add item
-    private void insertItem(String line1, String line2) {
-        mExampleList.add(new IngredientItem(line1, line2));
+   /* private void insertItem(String line1, String line2, String line3) {
+        mExampleList.add(new IngredientItem(line1, line2,line3));
         mAdapter.notifyItemInserted(mExampleList.size());
-    }
+    }*/
 
 
     @Override

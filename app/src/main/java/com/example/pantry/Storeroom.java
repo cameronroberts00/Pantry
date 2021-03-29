@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,14 +41,14 @@ public class Storeroom extends Fragment {
 
         loadData();
         buildRecyclerView();
-        setInsertButton();
-        Button buttonSave = view.findViewById(R.id.button_save);
+       // setInsertButton();
+       /* Button buttonSave = view.findViewById(R.id.button_save);
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveData();
             }
-        });
+        });*/
         return view;
     }
 
@@ -80,11 +81,16 @@ public class Storeroom extends Fragment {
         mAdapter = new IngredientAdapter(mIngredientList);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+    //    testy();
     }
 
+  //  private void testy(){
+   //     Log.d("TAG", "testy: "+mRecyclerView.getLayoutManager().findViewByPosition(0));
+   // }
+
     //thid added
-    private void setInsertButton() {
-        Button buttonInsert = view.findViewById(R.id.button_insert);
+    /*private void setInsertButton() {
+       Button buttonInsert = view.findViewById(R.id.button_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,12 +99,13 @@ public class Storeroom extends Fragment {
                 insertItem(name.getText().toString(), category.getText().toString());
             }
         });
-    }
+    }*/
     //Going to add item added
+    /*
     private void insertItem(String name, String category) {
         mIngredientList.add(new IngredientItem(name, category));
         mAdapter.notifyItemInserted(mIngredientList.size());
-    }
+    }*/
 
 
     @Override

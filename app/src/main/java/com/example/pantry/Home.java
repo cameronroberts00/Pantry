@@ -44,7 +44,7 @@ Calendar freshCalendar= Calendar.getInstance();//make new calendar and set its d
 SimpleDateFormat newDateFormat= new SimpleDateFormat("dd-MM-yyyy");//do all this fuckery to get a date then turn to string
 String again = newDateFormat.format(freshCalendar.getTime());
 
-
+//TODO integrate dates into the recycler view 
         try {
             Date currentDate = new SimpleDateFormat("dd-MM-yyyy").parse(again);//get current date
 

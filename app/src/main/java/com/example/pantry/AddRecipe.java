@@ -45,6 +45,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -77,10 +78,13 @@ public class AddRecipe extends Fragment {
 
     //These hold the product data individually
     private String category;
-    private int bestby;
+    private int bestby;//This is used to define how many days the product should last. that is then added to a custom Date
 
-JSONObject product;
-JSONArray products;
+
+    private String bestByDate;//i turn date into string so i can save, it goes here.
+
+//JSONObject product;
+//JSONArray products;
 TinyDB tinyDB;
 
     private RequestQueue mQueue;
@@ -136,7 +140,8 @@ private void getCategory( String categoryUppercased){
         //This is a category sorter. when called in for loop it goes thru all product categories and finds most identifiable one. For example, If a product has: "Milk, Vegan, Dairy" as categories, obviously milk is the main identifiable one for a human.
         switch (categoryUppercased){
             case "MILK":
-                bestby=7;
+                bestby=-7;
+                getDate(bestby);
                 category=categoryUppercased;//swap categoryuppercased into category. For example, this puts value of "milk"  into category. Because saying categoryUppercased after switch will show the first category on the product, not the main identifying one which is milk. itd show "Vegan" etc. this is because we are going through a for loop, and 1st item might not be correct category
                 break;
             default:
@@ -146,6 +151,15 @@ private void getCategory( String categoryUppercased){
 
 
 }
+    //String bestByDate;
+private void getDate(int bestby){//Take the amount of days the product will last and add this to a date, then this gets turned to a string and stored with the other product info
+    Calendar calendar = Calendar.getInstance();//initiate calendar
+    calendar.add(Calendar.DAY_OF_YEAR,bestby);//adds how many days product lasts for onto the date
+    SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");//format UK style date
+    bestByDate=simpleDateFormat.format(calendar.getTime());//save this new date as a string as Date objects cant go into shared prefs
+    Log.d("TAG", "Date set as:"+bestByDate);
+}
+
     ArrayList<IngredientItem> mIngredientList;
     private void jsonParse(String url) {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -170,11 +184,12 @@ private void getCategory( String categoryUppercased){
                             if(category==null){//If the product doesnt match any of the categories ive predefined in order to set a custom best-by date, set it to the first category defined by the API
                                 category=categories.getString(0).toUpperCase();
                                 bestby=5;//Set a relatively "safe" best by as this product could be anything, fish or other expire quick products etc.
+                                getDate(bestby);
                             }
 
                             barcodeText.setText(name);
                             categoryText.setText(category);
-                            bestByText.setText(String.valueOf(bestby));
+                            bestByText.setText(String.valueOf("Best in: "+bestby+" days"));
 
                             saveItem.setOnClickListener(buttonListener);//listen for the cancel and the save buttons which are used to add/try again with the product
                             cancelItem.setOnClickListener(buttonListener);
@@ -210,8 +225,7 @@ private void getCategory( String categoryUppercased){
         public void onClick(final View view) {
             switch(view.getId()) {
                 case R.id.save:
-                    insertItem(name, category);//save attributes
-
+                    insertItem(name, category,bestByDate);//save attributes
                     cancelSelection();
                     break;
                 case R.id.cancel:
@@ -225,10 +239,12 @@ private void getCategory( String categoryUppercased){
         }
     };
 
-
+public void addManually(View view){
+    Log.d("TAG", "snosig");
+}
    // private IngredientAdapter mAdapter;
-    private void insertItem(String name, String category){
-        mIngredientList.add(new IngredientItem(name, category));
+    private void insertItem(String name, String category, String bestByDate){
+        mIngredientList.add(new IngredientItem(name, category,bestByDate));
         //mAdapter.notifyItemInserted(mIngredientList.size());
         saveData();
     }
