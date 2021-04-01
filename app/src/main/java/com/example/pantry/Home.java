@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,7 +29,16 @@ public class Home extends Fragment {
     View view;
     private RequestQueue mQueue;
     String url="https://pantry-be356-default-rtdb.europe-west1.firebasedatabase.app/.json";//Firebase database for tips
-    String name;
+
+    //These are filled with json from firebase database
+    String name;//tip name
+    String imageUrl;//tip image
+    String body;//tip body
+    String category;//category of the tip (for sorting)
+    private RecyclerView mRecyclerView;
+    private IngredientAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -57,12 +67,21 @@ public class Home extends Fragment {
                        public void onResponse(JSONObject response) {
                            try {
 
-                               JSONArray jsonArray = response.getJSONArray("tip");//get the items array from the returned object
+                               JSONArray jsonArray = response.getJSONArray("tips");//get the items array from the returned object
                                Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
-                               JSONObject childObject = jsonArray.getJSONObject(0);//Go into the array, access the child which has the attributes - as this is a barcode search, we only need the first result, as this is the barcode's (normally only) match.
-                               name = childObject.getString("name");//Get name of the product out the child
-                               // barcodeText.setText(name);//Show name of scanned product
 
+                               // barcodeText.setText(name);//Show name of scanned product
+                                for(int i =0; jsonArray.length()>i;i++){
+                                    JSONObject childObject = jsonArray.getJSONObject(i);
+                                    name = childObject.getString("name");
+                                    body = childObject.getString("body");
+                                    imageUrl = childObject.getString("image");
+                                    category=childObject.getString("category");
+                                    Log.d("TAG", "JSON tip "+i+" acquired as "+name+" "+body+" "+imageUrl+" "+category);
+
+
+                                    //TODO add this shit to an arraylist as it cycles through, save it, then chuck it in the adapter to be put in recyclerview
+                                }
                            } catch (JSONException ex) {//for some reason, the try failed.
                                ex.printStackTrace();
 
