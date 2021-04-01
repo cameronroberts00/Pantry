@@ -6,8 +6,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -65,7 +68,7 @@ public class AddRecipe extends Fragment {
     private TextView barcodeText;
     private TextView bestByText;
     private TableLayout productInfo;
-    private Button manualButton;
+    private TextView manualButton;
     private TableLayout actionButtons;
     private Button saveItem;
     private Button cancelItem;
@@ -111,6 +114,7 @@ TinyDB tinyDB;
         errorText=view.findViewById(R.id.error);
         categoryText=view.findViewById(R.id.category_text);
         manualButton=view.findViewById(R.id.manual_button);
+        manualButton.setOnClickListener(buttonListener);
         closeError=view.findViewById(R.id.closeError);
         saveItem=view.findViewById(R.id.save);
         cancelItem=view.findViewById(R.id.cancel);
@@ -134,9 +138,9 @@ TinyDB tinyDB;
         return view;
     }
 
-private void getCategory( String categoryUppercased){
+public void getCategory( String categoryUppercased){
         //TODO add categories
-
+    Log.d("TAG", "Received category of: "+categoryUppercased);
         //This is a category sorter. when called in for loop it goes thru all product categories and finds most identifiable one. For example, If a product has: "Milk, Vegan, Dairy" as categories, obviously milk is the main identifiable one for a human.
         switch (categoryUppercased){
             case "MILK":
@@ -180,6 +184,7 @@ private void getDate(int bestby){//Take the amount of days the product will last
                             for (int i=0; i<categories.length(); i++){//Go through each category
                                 String categoryUppercased= categories.getString(i).toUpperCase();//each string, make all lowercase to fit in the category sorter
                                 getCategory(categoryUppercased);//send each category to category sorter
+                                getDate(bestby);//send the custom bestby date of the the date calculator calendar function
                             }
                             if(category==null){//If the product doesnt match any of the categories ive predefined in order to set a custom best-by date, set it to the first category defined by the API
                                 category=categories.getString(0).toUpperCase();
@@ -222,6 +227,7 @@ private void getDate(int bestby){//Take the amount of days the product will last
     }
 
     final View.OnClickListener buttonListener = new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public void onClick(final View view) {
             switch(view.getId()) {
                 case R.id.save:
@@ -235,12 +241,20 @@ private void getDate(int bestby){//Take the amount of days the product will last
                     cancelSelection();
                     hideError();
                     break;
+                case R.id.manual_button:
+                    addManually();
+                    break;
             }
         }
     };
 
-public void addManually(View view){
+@RequiresApi(api = Build.VERSION_CODES.KITKAT)
+public void addManually(){//launches the add manually fragment
+    //TODO start manually adding fraggy
     Log.d("TAG", "snosig");
+AddManually addManually = new AddManually();
+Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame,addManually).addToBackStack(null).commit();
+
 }
    // private IngredientAdapter mAdapter;
     private void insertItem(String name, String category, String bestByDate){

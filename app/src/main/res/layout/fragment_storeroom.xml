@@ -16,6 +16,42 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/white" />
+
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/emptyContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:text="Nothing here! "
+            android:textColor="@color/mainGreen"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:text="Tap the '+' icon to add some items."
+            android:textSize="18sp" />
+    </LinearLayout>
 
 </FrameLayout>

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -21,8 +22,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -45,6 +49,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
             expired=itemView.findViewById(R.id.expired);
             deleteButton = itemView.findViewById(R.id.deleteButton);//delete button needs to go here as it removes the arraylist item and the recycler item made from the arraylist
             deleteButton.setOnClickListener(new View.OnClickListener(){
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public void onClick(View view) {
                     removeIngredient(getAdapterPosition());//Remove ingredient on button click for location of current recycler thing
@@ -53,10 +58,19 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
         }
     }
 
+@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public void removeIngredient(int position){
-        mIngredientList.remove(position);
-        notifyItemRemoved(position);
-        notifyItemChanged(position);
+        //User spam tapping "delete" button causes Array out of bounds exception and crashes app. try/catch fixes it
+            try {
+                mIngredientList.remove(position);
+                notifyItemRemoved(position);
+                notifyItemChanged(position);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d("TAG", "caught in removeIngredient func");
+            }
+
+
 }
 
 

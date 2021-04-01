@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class Storeroom extends Fragment {
 
     View view;
-
+    View emptyContainer;
     ArrayList<IngredientItem> mIngredientList;
     private RecyclerView mRecyclerView;
     private IngredientAdapter mAdapter;
@@ -36,7 +37,7 @@ public class Storeroom extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_storeroom, container, false);
-
+        emptyContainer=view.findViewById(R.id.emptyContainer);
 
 
         loadData();
@@ -72,6 +73,16 @@ public class Storeroom extends Fragment {
         mIngredientList = gson.fromJson(json, type);
         if (mIngredientList == null) {
             mIngredientList = new ArrayList<>();
+        }
+       isEmpty();//check to see if storeroom is empty on open, if sso, give them a hint to add items
+    }
+
+    private void isEmpty(){
+        if (mIngredientList.size()<=0) {
+
+            Log.d("TAG", "Nowt here");
+            //TODO load graphic that shows its empty
+            emptyContainer.setVisibility(View.VISIBLE);
         }
     }
     private void buildRecyclerView() {

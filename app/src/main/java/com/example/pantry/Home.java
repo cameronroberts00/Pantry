@@ -9,16 +9,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Home extends Fragment {
+    ImageView image;
+    View view;
+    private RequestQueue mQueue;
+    String url="https://pantry-be356-default-rtdb.europe-west1.firebasedatabase.app/.json";//Firebase database for tips
+    String name;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_home, container, false);
         /*Trigger the updateProgress function in the progress bar (Add a point)*/
        FragmentManager fm = getFragmentManager();
         ProgressBar frag = (ProgressBar) fm.findFragmentById(R.id.progressFrame);
@@ -26,6 +40,88 @@ public class Home extends Fragment {
             frag.updateProgress();
         }
 
+        //image= view.findViewById(R.id.image);
+
+        //Glide.with(getActivity()).load("https://upload.wikimedia.org/wikipedia/commons/a/a4/Anatomy_of_a_Sunset-2.jpg").into(image);
+        mQueue = Volley.newRequestQueue(getActivity());
+        loadContent();
+
+        return view;
+    }
+
+   private void loadContent(){
+           JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                   new Response.Listener<JSONObject>() {
+                       //  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                       @Override
+                       public void onResponse(JSONObject response) {
+                           try {
+
+                               JSONArray jsonArray = response.getJSONArray("tip");//get the items array from the returned object
+                               Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
+                               JSONObject childObject = jsonArray.getJSONObject(0);//Go into the array, access the child which has the attributes - as this is a barcode search, we only need the first result, as this is the barcode's (normally only) match.
+                               name = childObject.getString("name");//Get name of the product out the child
+                               // barcodeText.setText(name);//Show name of scanned product
+
+                           } catch (JSONException ex) {//for some reason, the try failed.
+                               ex.printStackTrace();
+
+                           }
+                       }
+                   }, new Response.ErrorListener() {
+               @Override
+               public void onErrorResponse(VolleyError error) {//This will be triggered by API not finding product
+
+               }
+           });
+           mQueue.add(request);//add the call to the volley queue
+       }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
         int bestbydays=5;
         Calendar calendar = Calendar.getInstance();//initiate calendar
         calendar.add(Calendar.DAY_OF_YEAR,bestbydays);//adds how many days product lasts for onto the date
@@ -44,7 +140,7 @@ Calendar freshCalendar= Calendar.getInstance();//make new calendar and set its d
 SimpleDateFormat newDateFormat= new SimpleDateFormat("dd-MM-yyyy");//do all this fuckery to get a date then turn to string
 String again = newDateFormat.format(freshCalendar.getTime());
 
-//TODO integrate dates into the recycler view 
+//TODO integrate dates into the recycler view
         try {
             Date currentDate = new SimpleDateFormat("dd-MM-yyyy").parse(again);//get current date
 
@@ -62,17 +158,17 @@ String again = newDateFormat.format(freshCalendar.getTime());
             e.printStackTrace();
         }
 
+*/
+// Log.d("TAG", "Calendar "+bestbyDate);
 
-       // Log.d("TAG", "Calendar "+bestbyDate);
-
-        /*End of add a point*/
+/*End of add a point*/
 
 
 
- //Food goes out of date today.
-       // if(simpleDateFormat.format(calendar.getTime()).equals(dateOutput)){
-         //   Log.d("TAG", "if date is equal");
-        //}
+//Food goes out of date today.
+// if(simpleDateFormat.format(calendar.getTime()).equals(dateOutput)){
+//   Log.d("TAG", "if date is equal");
+//}
 /*
         TinyDB tinyDB = new TinyDB(getContext());
         ArrayList<Object> productObjArrayList = new ArrayList<>();
@@ -145,9 +241,3 @@ nudder = (ProductObj)receivedProductObjArrayList.get(2);//2 here would be the ob
      Log.d("TAG", "onCreateView: " + nudder.getName()+nudder.getCategory());
 
 */
-
-        return inflater.inflate(R.layout.fragment_first, container, false);
-    }
-
-
-}

@@ -30,6 +30,9 @@ dependencies {
     implementation 'com.android.volley:volley:1.2.0'
     implementation 'com.google.android.gms:play-services-vision:11.0.2'
 
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    //annotationProcessor 'com.github.bumptech.glide:compiler4.11.0'
+
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.2'
     implementation 'com.google.code.gson:gson:2.8.6'
     //noinspection GradleCompatible
