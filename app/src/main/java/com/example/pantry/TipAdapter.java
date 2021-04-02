@@ -1,5 +1,6 @@
 package com.example.pantry;
 
+import android.content.Context;
 import android.media.Image;
 import android.os.Build;
 import android.util.Log;
@@ -18,16 +19,22 @@ import java.util.Date;
 
 import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class TipAdapter extends RecyclerView.Adapter<TipAdapter.ExampleViewHolder>{
     public ArrayList<TipBlogItem> mTipList;
+   // public String mName;
+   // public String mBody;
+   // public String mImage;
+    // public int mCount;
 
     public class ExampleViewHolder extends RecyclerView.ViewHolder {
         public TextView tipName;
         public TextView tipBody;
         public ImageView tipImage;
         public CardView tipContainer;
+
         // final public Button deleteButton;
 
         public ExampleViewHolder(View itemView) {
@@ -55,8 +62,15 @@ public void openTip(int position){
 }
 
 
-    public TipAdapter(ArrayList<TipBlogItem> TipList) {
+    public TipAdapter(ArrayList<TipBlogItem> TipList/*Context context, String name, String body, String imageUrl, String category,int count*/) {
+
         mTipList = TipList;
+       // mName=name;
+       // mBody=body;
+        //mImage=imageUrl;
+       // mCount=count;
+        //Log.d("TAG", "TipAdapter: "+mName+mBody+mImage);
+
     }
 
     @Override
@@ -70,15 +84,18 @@ public void openTip(int position){
     @Override
     public void onBindViewHolder(TipAdapter.ExampleViewHolder holder, int position) {
         TipBlogItem currentItem = mTipList.get(position);
+        holder.tipName.setText(currentItem.getName());
      //   holder.productName.setText(currentItem.getName());
        // holder.productCategory.setText(currentItem.getCategory());
        // holder.productBestByDate.setText(currentItem.getBestByDate());
        // holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
+        Log.d("TAG", "Tip name"+currentItem.getName());
     }
 
     @Override
     public int getItemCount() {
-        return mTipList.size();
+       return mTipList.size();
+
     }
 
 
