@@ -1,7 +1,10 @@
 package com.example.pantry;
 
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -39,14 +42,16 @@ public class Home extends Fragment {
     String name;//tip name
     String imageUrl;//tip image
     String body;//tip body
-    ArrayList<TipBlogItem> mTipList;
+    ArrayList<TipBlogItem> mTipList,mTipList2;
     int count=0;//used to count the tips and telll the adapter how many tips to display
     String category;//category of the tip (for sorting)
 
-    private RecyclerView mRecyclerView;
-    private TipAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView mRecyclerView,mRecyclerView2;
+    private TipAdapter mAdapter,mAdapter2;
+    private RecyclerView.LayoutManager mLayoutManager, mLayoutManager2;
+
     private ImageView featuredImage;
+    private CardView featured;
     private ScrollView content;
     private ConstraintLayout loading;
 
@@ -61,30 +66,43 @@ public class Home extends Fragment {
             frag.updateProgress();
         }
 
-        //image= view.findViewById(R.id.image);
-       // mRecyclerView=view.findViewById(R.id.recyclerview);
+
         buildRecycler1();
+        buildRecycler2();
         featuredImage=view.findViewById(R.id.featured_image);
+        featured=view.findViewById(R.id.featured_holder);
         loading=view.findViewById(R.id.loading);
         content=view.findViewById(R.id.content);
         content.setVisibility(View.INVISIBLE);
 
+        //todo get rid of this shit
         Glide.with(getActivity()).load("https://upload.wikimedia.org/wikipedia/commons/a/a4/Anatomy_of_a_Sunset-2.jpg").into(featuredImage);
         mQueue = Volley.newRequestQueue(getActivity());
         loadContent();
 
         return view;
     }
-    private void buildRecycler1(){
+    private void buildRecycler1(){//build the first recycler
         if (mTipList == null) {
             mTipList = new ArrayList<>();
         }
             mRecyclerView = view.findViewById(R.id.recyclerview);
             mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-            mAdapter = new TipAdapter(mTipList);
+            mLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+            mAdapter = new TipAdapter(mTipList,getContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
             mRecyclerView.setAdapter(mAdapter);
+    }
+    private void buildRecycler2(){//initialise and build the second recycler
+        if (mTipList2 == null) {
+            mTipList2 = new ArrayList<>();
+        }
+        mRecyclerView2 = view.findViewById(R.id.recyclerview2);
+        mRecyclerView2.setHasFixedSize(true);
+        mLayoutManager2 = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        mAdapter2 = new TipAdapter(mTipList2,getContext());
+        mRecyclerView2.setLayoutManager(mLayoutManager2);
+        mRecyclerView2.setAdapter(mAdapter2);
     }
 
    private void loadContent(){
@@ -92,6 +110,7 @@ public class Home extends Fragment {
            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                    new Response.Listener<JSONObject>() {
                        //  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                       @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                        @Override
                        public void onResponse(JSONObject response) {
                            try {
@@ -100,9 +119,10 @@ public class Home extends Fragment {
                                JSONArray jsonArray = response.getJSONArray("tips");//get the items array from the returned object
                                Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
 
-                               //todo get random number from array length, when the for loop gets this item, send it to the featured holder
 
-                               // barcodeText.setText(name);//Show name of scanned product
+                               featureRandom(jsonArray);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read
+
+                               //this for loop iterates the array and accesses all the attributes of each individual item
                                 for(int i =0; jsonArray.length()>i;i++){
                                     JSONObject childObject = jsonArray.getJSONObject(i);
                                     name = childObject.getString("name");
@@ -111,7 +131,7 @@ public class Home extends Fragment {
                                     category=childObject.getString("category");
                                     Log.d("TAG", "JSON tip "+i+" acquired as "+name+" "+body+" "+imageUrl+" "+category);
 
-                                    //TODO perhaps category sorting
+                                    //split the tips into 2 recycler views based on categories in the json
                                     sortCategories(category);
 
                    }
@@ -129,18 +149,74 @@ public class Home extends Fragment {
            mQueue.add(request);//add the call to the volley queue
        }
 
+    String mFeaturedName;
+    String mFeaturedBody;
+    String mFeaturedUrl;
+       @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+       public void featureRandom(JSONArray jsonArray){
+           //todo get random number from array length, when the for loop gets this item, send it to the featured holder
+           try {
+               int random = (int) ((Math.random() * ((jsonArray.length()) + 1)));//get random number in array's length
+               Log.d("TAG", "String caught for removal" + jsonArray.getString(random));
+
+               //take the entries attributes and store them in seperate fields
+                   JSONObject childObject = jsonArray.getJSONObject(random);
+                   mFeaturedName = childObject.getString("name");
+                   mFeaturedBody = childObject.getString("body");
+                   mFeaturedUrl = childObject.getString("image");
+
+               Log.d("TAG", "Featured tip is: " + mFeaturedName+mFeaturedBody);
+
+               featured.setOnClickListener(listener);
+
+
+               //remove the item thats going into the featured tip holder to stop it appearing with the others as well
+               jsonArray.remove(random);
+           }catch (Exception e){
+               e.printStackTrace();
+           }
+       }
+
+       View.OnClickListener listener = new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               switch(view.getId()){
+                   case R.id.featured_holder:
+                       Log.d("TAG", "Tapped featured holder\n"+mFeaturedName);
+                       //todo deal with featured holder taps
+                       //todo add items to bundle, send this with new fragment instannce of openedtip.java
+                       break;
+               }
+           }
+       };
+
        public void sortCategories(String category){
         if(category.equals("waste")){//If first category, chuck it in the first recycler
             Log.d("TAG", "Category 1 "+category);
             mTipList.add(new TipBlogItem(name, category,body,imageUrl));
             buildRecycler1();//Add item and send to recycler
         }else if(category.equals("tip")){
-            //mCategory2list.add
-            //build recycler2
+            mTipList2.add(new TipBlogItem(name, category,body,imageUrl));
+          //  mTipList2.add(new TipBlogItem(name, category,body,imageUrl));
+            buildRecycler2();//Add item and send to recycler
             Log.d("TAG", "Category 2 "+category);
-            //todo build second recycler from second recycler method here
+        }else{
+            Log.d("TAG", "Entry with obscure category: "+name+category);
         }
        }
+
+    @Override
+    public void onPause() {
+        //when activity is minimised, reset arraylists.
+        /*when OpenedTip.java fragment is launched from TipAdapter.java, these arraylists stay intact, so navigating back using Android's
+        inbuilt back arrow brings user back to the pre-loaded fragment they left off. This then re-calls the json and infinitely stacks the tip cards.
+        This solves it.
+         */
+        super.onPause();
+        mTipList2=null;
+        mTipList=null;
+        Log.d("TAG", "onPause: ArrayLists set to null");
+    }
 }
 
 

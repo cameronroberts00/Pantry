@@ -200,8 +200,8 @@ private static final String TAG="MainActivity";
 
 
         public void grabTexts()  {
-           name = nameText.getText().toString();
-           category = categoryText.getText().toString();
+           name = nameText.getText().toString().trim();//the values saved are trimmed Strings from input fields. (Trimming stops users breaking the items by holding enter for whitespace)
+           category = categoryText.getText().toString().trim();
 
             //Check user has entered other fields before launching date picker
             if(name.isEmpty()||category.isEmpty()){

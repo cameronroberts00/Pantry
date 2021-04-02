@@ -3,6 +3,7 @@ package com.example.pantry;
 import android.content.Context;
 import android.media.Image;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,29 +12,36 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class TipAdapter extends RecyclerView.Adapter<TipAdapter.ExampleViewHolder>{
     public ArrayList<TipBlogItem> mTipList;
+    private Context mContext;
+
    // public String mName;
    // public String mBody;
    // public String mImage;
     // public int mCount;
-
+   public CardView tipContainer;
     public class ExampleViewHolder extends RecyclerView.ViewHolder {
         public TextView tipName;
         public TextView tipBody;
         public ImageView tipImage;
-        public CardView tipContainer;
+
 
         // final public Button deleteButton;
 
@@ -44,26 +52,35 @@ public class TipAdapter extends RecyclerView.Adapter<TipAdapter.ExampleViewHolde
             tipImage=itemView.findViewById(R.id.tip_blog_image);
             tipContainer=itemView.findViewById(R.id.tip_container);
 
-            tipContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                   openTip(getAdapterPosition());
-                }
-            });
+
 
         }
     }
 
-public void openTip(int position){
-    Log.d("TAG", "Tip clicked"+position);
-        /*TODO
-        *  1. Create opened tip activity
-        * 2. Send current tip data to this new fragment activity*/
+public void openTip(int position,TipAdapter.ExampleViewHolder holder,View view){
+    Log.d("TAG", "Tip clicked: "+position+holder.tipName.getText());
+
+    //Grab the clicked item's info and send it to a new fragment to view
+    String name = mTipList.get(position).getName();
+    String body=mTipList.get(position).getBody();
+    String image=mTipList.get(position).getmImageUrl();
+
+    Fragment openedTip = new OpenedTip();
+    AppCompatActivity activity = (AppCompatActivity) view.getContext();
+    Bundle bundle = new Bundle();
+    bundle.putString("name", name);
+    bundle.putString("body", body);
+    bundle.putString("image",image);
+
+    openedTip.setArguments(bundle);
+
+
+    activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame, openedTip).addToBackStack(null).commit();
 }
 
 
-    public TipAdapter(ArrayList<TipBlogItem> TipList/*Context context, String name, String body, String imageUrl, String category,int count*/) {
-
+    public TipAdapter(ArrayList<TipBlogItem> TipList,Context context/*Context context, String name, String body, String imageUrl, String category,int count*/) {
+        mContext=context;//set context as context of layout's adapter so Glide image library can correctly put images in
         mTipList = TipList;
        // mName=name;
        // mBody=body;
@@ -82,11 +99,23 @@ public void openTip(int position){
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onBindViewHolder(TipAdapter.ExampleViewHolder holder, int position) {
-        TipBlogItem currentItem = mTipList.get(position);
+    public void onBindViewHolder(final TipAdapter.ExampleViewHolder holder, final int position) {
+        final TipBlogItem currentItem = mTipList.get(position);
+
         holder.tipName.setText(currentItem.getName());
-     //   holder.productName.setText(currentItem.getName());
-       // holder.productCategory.setText(currentItem.getCategory());
+         holder.tipBody.setText(currentItem.getBody());
+
+        Glide.with(mContext).load(currentItem.getmImageUrl()).into(holder.tipImage);
+        Log.d("TAG", "Loading image: "+currentItem.getmImageUrl());
+        if(holder.tipBody.getText().length()>=50){
+            clipBody(holder);//clip the text body if its too long
+        }
+        tipContainer.setOnClickListener(new View.OnClickListener() {//if a tip is clicked, open it
+            @Override
+            public void onClick(View view) {
+                openTip(position,holder,view);
+            }
+        });
        // holder.productBestByDate.setText(currentItem.getBestByDate());
        // holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
         Log.d("TAG", "Tip name"+currentItem.getName());
@@ -97,6 +126,13 @@ public void openTip(int position){
        return mTipList.size();
 
     }
+
+public void clipBody(TipAdapter.ExampleViewHolder holder){
+    Log.d("TAG", "SNIP ");
+    String snipped= (String) holder.tipBody.getText();
+    snipped=snipped.substring(0,50)+"...".trim();//Truncated body text is a substring from char 0 to 50 with ... on the end and no whitespace
+    holder.tipBody.setText(snipped);
+}
 
 
 }
