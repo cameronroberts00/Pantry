@@ -48,7 +48,7 @@
                         android:id="@+id/image_view"
                         android:layout_width="match_parent"
                         android:layout_height="262dp"
-                        android:scaleType="fitXY"
+                        android:scaleType="centerCrop"
                         tools:src="@tools:sample/backgrounds/scenic" />
 
                     <TextView

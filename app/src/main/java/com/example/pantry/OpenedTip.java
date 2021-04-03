@@ -49,10 +49,10 @@ Button back;
             nameText.setText(name);
             bodyText.setText(body);
             Glide.with(getContext()).load(image).into(imageView);
-            Log.d("TAG", "onCreate: "+name+body);
+            Log.d("TAG", "Attributes loaded are"+name+body+image);
         }
 
-        Glide.with(getActivity()).load("https://upload.wikimedia.org/wikipedia/commons/a/a4/Anatomy_of_a_Sunset-2.jpg").into(imageView);
+        //Glide.with(getActivity()).load("https://upload.wikimedia.org/wikipedia/commons/a/a4/Anatomy_of_a_Sunset-2.jpg").into(imageView);
 
 
 

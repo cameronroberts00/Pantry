@@ -1,9 +1,11 @@
 package com.example.pantry;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -17,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -30,7 +33,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class Home extends Fragment {
     ImageView image;
@@ -43,8 +51,15 @@ public class Home extends Fragment {
     String imageUrl;//tip image
     String body;//tip body
     ArrayList<TipBlogItem> mTipList,mTipList2;
-    int count=0;//used to count the tips and telll the adapter how many tips to display
+    //int count=0;//used to count the tips and telll the adapter how many tips to display
     String category;//category of the tip (for sorting)
+
+    //These are used to hold featured tip info
+    String mFeaturedName;
+    String mFeaturedBody;
+    String mFeaturedUrl;
+
+    private TextView featuredName;
 
     private RecyclerView mRecyclerView,mRecyclerView2;
     private TipAdapter mAdapter,mAdapter2;
@@ -74,9 +89,8 @@ public class Home extends Fragment {
         loading=view.findViewById(R.id.loading);
         content=view.findViewById(R.id.content);
         content.setVisibility(View.INVISIBLE);
+        featuredName=view.findViewById(R.id.featured_name);
 
-        //todo get rid of this shit
-        Glide.with(getActivity()).load("https://upload.wikimedia.org/wikipedia/commons/a/a4/Anatomy_of_a_Sunset-2.jpg").into(featuredImage);
         mQueue = Volley.newRequestQueue(getActivity());
         loadContent();
 
@@ -119,8 +133,70 @@ public class Home extends Fragment {
                                JSONArray jsonArray = response.getJSONArray("tips");//get the items array from the returned object
                                Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
 
+                                //Get last saved day,
+                               //if last saved day == current day, do nothing
+                               //else (ie, day's changed), then get a new random feature
 
-                               featureRandom(jsonArray);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read
+                                //This is to get a new "featured" tip every day
+                                //get todays date
+                               /*
+                               Calendar todayCalendar= Calendar.getInstance();//make new calendar and set its date to now
+                               SimpleDateFormat newDateFormat= new SimpleDateFormat("dd-MM-yyyy");
+                               String thisDate = newDateFormat.format(todayCalendar.getTime());//turn it into string so it can be converted from SimpleDateFormat to a Date
+
+                               try {//This try takes both date strings and converts them into Dates so they can be checked against each other
+                                   Date currentDate = new SimpleDateFormat("dd-MM-yyyy").parse(thisDate);//Create a current date from thisDate
+                                  // Date datetoCompare = new SimpleDateFormat("dd-MM-yyyy").parse(mBestbyDate);//Create a date from product best by
+                                   //Log.d("TAG", "Date to compare "+datetoCompare);
+                                   Log.d("TAG", "Current date "+currentDate);
+*/
+
+                                //todo figure this shit out cause if a date is created in on create. then it will always be todays date.
+                                   //todo maybe a new date can be saved in the else statement?
+
+                             /*      if (compareDate.equals(currentDate)){
+                                       //If day is the same, do nowt.
+
+                                    //   expiredItem(position,holder);//Call the expired func with positions affected, it will then flag them to user
+                                   }else{
+
+                                       //Day has changed, call jsonRandomFeature shit
+                                   }*/
+
+/*if current date != saved date
+*
+*
+*
+*
+*
+*else
+* saved date = current date
+* change featured thing
+* */
+
+
+                               /*}catch (Exception e){
+
+                               }*/
+
+                                //changes the featured tip once a day
+                               Calendar calendar = Calendar.getInstance();
+                               int currentDay=calendar.get(Calendar.DAY_OF_MONTH);
+                               SharedPreferences settings = getContext().getSharedPreferences("PREFS", 0);
+                               int lastDay = settings.getInt("day",0);
+                               if(lastDay!=currentDay){
+                                   SharedPreferences.Editor editor = settings.edit();
+                                   editor.putInt("day",currentDay);
+                                   editor.commit();
+
+                                   featureRandom(jsonArray);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read
+
+                               }else{
+                                   //TODO figure a way to stop it only showing once a day, maybe by saving which one got featured to shared prefs and pulling it here
+                               }
+
+
+
 
                                //this for loop iterates the array and accesses all the attributes of each individual item
                                 for(int i =0; jsonArray.length()>i;i++){
@@ -132,7 +208,12 @@ public class Home extends Fragment {
                                     Log.d("TAG", "JSON tip "+i+" acquired as "+name+" "+body+" "+imageUrl+" "+category);
 
                                     //split the tips into 2 recycler views based on categories in the json
-                                    sortCategories(category);
+                                    try {
+                                        sortCategories(category);//chuck it in a try as spamming home button causes nullpointer exception and a crash when adding stuff to tiplists, if caught it doesnt affect performance
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+
 
                    }
                            } catch (JSONException ex) {//for some reason, the try failed.
@@ -149,14 +230,12 @@ public class Home extends Fragment {
            mQueue.add(request);//add the call to the volley queue
        }
 
-    String mFeaturedName;
-    String mFeaturedBody;
-    String mFeaturedUrl;
+
        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
        public void featureRandom(JSONArray jsonArray){
            //todo get random number from array length, when the for loop gets this item, send it to the featured holder
            try {
-               int random = (int) ((Math.random() * ((jsonArray.length()) + 1)));//get random number in array's length
+               int random = (int) ((Math.random() * ((jsonArray.length()) )));//get random number in array's length
                Log.d("TAG", "String caught for removal" + jsonArray.getString(random));
 
                //take the entries attributes and store them in seperate fields
@@ -165,6 +244,8 @@ public class Home extends Fragment {
                    mFeaturedBody = childObject.getString("body");
                    mFeaturedUrl = childObject.getString("image");
 
+                   featuredName.setText(mFeaturedName);
+               Glide.with(getActivity()).load(mFeaturedUrl).into(featuredImage);
                Log.d("TAG", "Featured tip is: " + mFeaturedName+mFeaturedBody);
 
                featured.setOnClickListener(listener);
@@ -174,6 +255,7 @@ public class Home extends Fragment {
                jsonArray.remove(random);
            }catch (Exception e){
                e.printStackTrace();
+               Log.d("TAG", "In catch on featureRandom");
            }
        }
 
@@ -183,6 +265,18 @@ public class Home extends Fragment {
                switch(view.getId()){
                    case R.id.featured_holder:
                        Log.d("TAG", "Tapped featured holder\n"+mFeaturedName);
+
+                       Fragment openedTip = new OpenedTip();
+                       AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                       Bundle bundle = new Bundle();
+                       bundle.putString("name", mFeaturedName);
+                       bundle.putString("body", mFeaturedBody);
+                       bundle.putString("image",mFeaturedUrl);
+
+                       openedTip.setArguments(bundle);
+
+
+                       activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame, openedTip).addToBackStack(null).commit();
                        //todo deal with featured holder taps
                        //todo add items to bundle, send this with new fragment instannce of openedtip.java
                        break;
@@ -192,14 +286,14 @@ public class Home extends Fragment {
 
        public void sortCategories(String category){
         if(category.equals("waste")){//If first category, chuck it in the first recycler
-            Log.d("TAG", "Category 1 "+category);
+         //   Log.d("TAG", "Category 1 "+category);
             mTipList.add(new TipBlogItem(name, category,body,imageUrl));
             buildRecycler1();//Add item and send to recycler
         }else if(category.equals("tip")){
             mTipList2.add(new TipBlogItem(name, category,body,imageUrl));
           //  mTipList2.add(new TipBlogItem(name, category,body,imageUrl));
             buildRecycler2();//Add item and send to recycler
-            Log.d("TAG", "Category 2 "+category);
+        //    Log.d("TAG", "Category 2 "+category);
         }else{
             Log.d("TAG", "Entry with obscure category: "+name+category);
         }

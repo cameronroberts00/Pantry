@@ -106,7 +106,7 @@ public void openTip(int position,TipAdapter.ExampleViewHolder holder,View view){
          holder.tipBody.setText(currentItem.getBody());
 
         Glide.with(mContext).load(currentItem.getmImageUrl()).into(holder.tipImage);
-        Log.d("TAG", "Loading image: "+currentItem.getmImageUrl());
+       // Log.d("TAG", "Loading image: "+currentItem.getmImageUrl());
         if(holder.tipBody.getText().length()>=50){
             clipBody(holder);//clip the text body if its too long
         }
@@ -118,7 +118,7 @@ public void openTip(int position,TipAdapter.ExampleViewHolder holder,View view){
         });
        // holder.productBestByDate.setText(currentItem.getBestByDate());
        // holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
-        Log.d("TAG", "Tip name"+currentItem.getName());
+       // Log.d("TAG", "Tip name"+currentItem.getName());
     }
 
     @Override
@@ -128,7 +128,7 @@ public void openTip(int position,TipAdapter.ExampleViewHolder holder,View view){
     }
 
 public void clipBody(TipAdapter.ExampleViewHolder holder){
-    Log.d("TAG", "SNIP ");
+  //  Log.d("TAG", "SNIP ");
     String snipped= (String) holder.tipBody.getText();
     snipped=snipped.substring(0,50)+"...".trim();//Truncated body text is a substring from char 0 to 50 with ... on the end and no whitespace
     holder.tipBody.setText(snipped);
