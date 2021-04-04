@@ -13,10 +13,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -37,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -58,7 +62,7 @@ public class Home extends Fragment {
     String mFeaturedName;
     String mFeaturedBody;
     String mFeaturedUrl;
-
+    int random;//this is 0 by default but set between 0 and jsonaray length to determine featured tip.
     private TextView featuredName;
 
     private RecyclerView mRecyclerView,mRecyclerView2;
@@ -69,6 +73,9 @@ public class Home extends Fragment {
     private CardView featured;
     private ScrollView content;
     private ConstraintLayout loading;
+    private ConstraintLayout timeout;
+    private Button refresh;
+    private boolean loaded=false;//this sets to true once jsonarray with content comes thru. if it hasnt set to true in 10 seconds, tell user to check internet/reload etc.
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,14 +94,35 @@ public class Home extends Fragment {
         featuredImage=view.findViewById(R.id.featured_image);
         featured=view.findViewById(R.id.featured_holder);
         loading=view.findViewById(R.id.loading);
+        timeout=view.findViewById(R.id.timeout);
         content=view.findViewById(R.id.content);
         content.setVisibility(View.INVISIBLE);
+        timeout.setVisibility(View.INVISIBLE);
+        refresh=view.findViewById(R.id.refresh);
+        refresh.setOnClickListener(listener);
         featuredName=view.findViewById(R.id.featured_name);
 
         mQueue = Volley.newRequestQueue(getActivity());
+        checkTimeout();
         loadContent();
 
+
+
         return view;
+    }
+    private void checkTimeout(){
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+             if(loaded==false){
+                 //if content hasnt loading in 10 seconds, tell user to refresh
+                 Log.d("TAG", "Hasn't loaded in 10 seconds, offer refresh.");
+                 loading.setVisibility(View.INVISIBLE);
+                 timeout.setVisibility(View.VISIBLE);
+             }
+            }
+        }, 10000);
     }
     private void buildRecycler1(){//build the first recycler
         if (mTipList == null) {
@@ -129,6 +157,7 @@ public class Home extends Fragment {
                        public void onResponse(JSONObject response) {
                            try {
                                loading.setVisibility(View.INVISIBLE);
+                               loaded=true;
                                content.setVisibility(View.VISIBLE);//hide content while its just empty
                                JSONArray jsonArray = response.getJSONArray("tips");//get the items array from the returned object
                                Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
@@ -189,10 +218,16 @@ public class Home extends Fragment {
                                    editor.putInt("day",currentDay);
                                    editor.commit();
 
-                                   featureRandom(jsonArray);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read
+                                   featureRandom(jsonArray,random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
 
-                               }else{
+                               }else{//if function has already run today, the featured tip has already been chosen, just grab it from shared preferences
                                    //TODO figure a way to stop it only showing once a day, maybe by saving which one got featured to shared prefs and pulling it here
+
+                                   SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
+                                   random = randomStorer.getInt("random",0);
+                                   //random=//from saved prefs;
+                                   Log.d("TAG", "Function already called today, getting random feature from storage "+random);
+                                   featureRandom(jsonArray,random);
                                }
 
 
@@ -232,10 +267,20 @@ public class Home extends Fragment {
 
 
        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-       public void featureRandom(JSONArray jsonArray){
+       public void featureRandom(JSONArray jsonArray, int random){
            //todo get random number from array length, when the for loop gets this item, send it to the featured holder
            try {
-               int random = (int) ((Math.random() * ((jsonArray.length()) )));//get random number in array's length
+               if(random==0) {
+                   Log.d("TAG", "Random feature wasnt initialised, getting random number and saving it "+random);
+                   //if random isnt initaliased, then this was called from the function that runs once per day, get a random number and save it.
+                   random = (int) ((Math.random() * ((jsonArray.length()))));//get random number in array's length
+
+                   SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
+                   SharedPreferences.Editor editor = randomStorer.edit();
+                   editor.putInt("random",random);
+                   editor.commit();
+
+               }
                Log.d("TAG", "String caught for removal" + jsonArray.getString(random));
 
                //take the entries attributes and store them in seperate fields
@@ -279,6 +324,11 @@ public class Home extends Fragment {
                        activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame, openedTip).addToBackStack(null).commit();
                        //todo deal with featured holder taps
                        //todo add items to bundle, send this with new fragment instannce of openedtip.java
+                       break;
+                   case R.id.refresh://user timed out, this reloads frag
+                       Fragment home = new Home();
+                       AppCompatActivity reload = (AppCompatActivity) view.getContext();
+                       reload.getSupportFragmentManager().beginTransaction().replace(R.id.frame, home).addToBackStack(null).commit();
                        break;
                }
            }

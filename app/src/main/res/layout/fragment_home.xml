@@ -38,7 +38,7 @@
                 android:layout_below="@id/recyclerview"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:text="Featured"
+                android:text="Pick of the Day"
                 android:textColor="@color/mainGreen"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -152,6 +152,40 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/updateProgressBar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/timeout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:gravity="center"
+            android:text="Uh oh, something went wrong...\nPlease check your internet connection and try again."
+            android:textColor="@color/mainGreen"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Refresh"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView6"
+            app:backgroundTint="@color/mainGreen"
+            app:cornerRadius="20dp"
+            app:iconPadding="4dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
