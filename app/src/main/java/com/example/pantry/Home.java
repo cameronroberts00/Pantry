@@ -162,52 +162,6 @@ public class Home extends Fragment {
                                JSONArray jsonArray = response.getJSONArray("tips");//get the items array from the returned object
                                Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
 
-                                //Get last saved day,
-                               //if last saved day == current day, do nothing
-                               //else (ie, day's changed), then get a new random feature
-
-                                //This is to get a new "featured" tip every day
-                                //get todays date
-                               /*
-                               Calendar todayCalendar= Calendar.getInstance();//make new calendar and set its date to now
-                               SimpleDateFormat newDateFormat= new SimpleDateFormat("dd-MM-yyyy");
-                               String thisDate = newDateFormat.format(todayCalendar.getTime());//turn it into string so it can be converted from SimpleDateFormat to a Date
-
-                               try {//This try takes both date strings and converts them into Dates so they can be checked against each other
-                                   Date currentDate = new SimpleDateFormat("dd-MM-yyyy").parse(thisDate);//Create a current date from thisDate
-                                  // Date datetoCompare = new SimpleDateFormat("dd-MM-yyyy").parse(mBestbyDate);//Create a date from product best by
-                                   //Log.d("TAG", "Date to compare "+datetoCompare);
-                                   Log.d("TAG", "Current date "+currentDate);
-*/
-
-                                //todo figure this shit out cause if a date is created in on create. then it will always be todays date.
-                                   //todo maybe a new date can be saved in the else statement?
-
-                             /*      if (compareDate.equals(currentDate)){
-                                       //If day is the same, do nowt.
-
-                                    //   expiredItem(position,holder);//Call the expired func with positions affected, it will then flag them to user
-                                   }else{
-
-                                       //Day has changed, call jsonRandomFeature shit
-                                   }*/
-
-/*if current date != saved date
-*
-*
-*
-*
-*
-*else
-* saved date = current date
-* change featured thing
-* */
-
-
-                               /*}catch (Exception e){
-
-                               }*/
-
                                 //changes the featured tip once a day
                                Calendar calendar = Calendar.getInstance();
                                int currentDay=calendar.get(Calendar.DAY_OF_MONTH);
@@ -229,9 +183,6 @@ public class Home extends Fragment {
                                    Log.d("TAG", "Function already called today, getting random feature from storage "+random);
                                    featureRandom(jsonArray,random);
                                }
-
-
-
 
                                //this for loop iterates the array and accesses all the attributes of each individual item
                                 for(int i =0; jsonArray.length()>i;i++){

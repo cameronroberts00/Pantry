@@ -3,8 +3,10 @@ package com.example.pantry;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,11 +21,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -31,63 +46,225 @@ import static android.content.Context.MODE_PRIVATE;
 public class Recipes extends Fragment {
 
     View view;
-
-    ArrayList<IngredientItem> mExampleList;
+    private RequestQueue mQueue;
+    private RecyclerView recipeRecycler;
+    ArrayList<IngredientItem> mIngredientList;
+    ArrayList<RecipeItem> mRecipeList;
     private RecyclerView mRecyclerView;
     private IngredientAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    boolean loaded=false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_recipes, container, false);
-
-
-
+        mQueue = Volley.newRequestQueue(getActivity());
+        mRecipeList = new ArrayList<>();
+        recipeRecycler=view.findViewById(R.id.recipe_recycler);
             loadData();
-            buildRecyclerView();
-           // setInsertButton();
-          /* Button buttonSave = view.findViewById(R.id.button_save);
-            buttonSave.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveData();
-                }
-            });*/
+           String formatedIngredients=getIngredientString();//Gets a ",+" formatted + concatenated string from user's storage items
+        String url=getUrl(formatedIngredients);
+
+        if(mIngredientList.size()!=0){//check user has items in their storage before api request
+            getRecipes(url);
+        }else{
+            //TODO user has no items in storage, tell them here
+            Log.d("TAG", "No items found!");
+        }
+
+        Log.d("TAG", "Formatted url is: " +url);
+
+
         return view;
         }
 
 
-
-
-
-    void saveData() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(mExampleList);
-        editor.putString("task list", json);
-        editor.apply();
-    }
     private void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("task list", null);
         Type type = new TypeToken<ArrayList<IngredientItem>>() {}.getType();
-        mExampleList = gson.fromJson(json, type);
-        if (mExampleList == null) {
-            mExampleList = new ArrayList<>();
+        mIngredientList = gson.fromJson(json, type);
+        if (mIngredientList == null) {
+            mIngredientList = new ArrayList<>();
+        }
+
+    }
+
+    private String getIngredientString(){
+        String ingredientName="";//This holds all the ingredients concatenated
+        for(int i=0;i<mIngredientList.size();i++) {
+            ingredientName=ingredientName+mIngredientList.get(i).getName()+",+";
+            Log.d("TAG", "Ingredient: "+ingredientName);
+        }
+        //This string holds the concatenated string minus not needed ending
+        String formatedIngredients =  ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
+
+        Log.d("TAG", "Final ingredient string: "+formatedIngredients);
+        return formatedIngredients;
+    }
+
+    private String getUrl(String formatedIngredients){
+        String urlStart=" https://api.spoonacular.com/recipes/findByIngredients?number=";
+
+        //Controls results returned
+       int resultNumber=5;
+
+       //Controls how many used ingredients are returned
+        String ranking="&ranking=";
+        int rankingNumber=2;//1 = maximise used ingredients. 2= minimise ingredients that are missing
+
+        String ingredientsAre="&ingredients=";
+    //    formatedIngredients;
+String apiKey="&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
+
+
+        return urlStart + resultNumber + ranking + rankingNumber + ingredientsAre +formatedIngredients + apiKey;
+    }
+
+   private void getRecipes(String url){
+       JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+               Request.Method.GET,
+              url,
+               null,
+               new Response.Listener<JSONArray>() {
+                   @Override
+                   public void onResponse(JSONArray response) {
+                       Log.d("TAG", "Sending request");
+                  loaded=true;
+                       try{
+                           for(int i=0;i<response.length();i++){
+                               JSONObject currentRecipe = response.getJSONObject(i);
+                               String id = currentRecipe.getString("id");
+                               String title = currentRecipe.getString("title");
+                               String image = currentRecipe.getString("image");
+                               ArrayList<String> missing=new ArrayList<>();
+                               ArrayList<String> used=new ArrayList<>();
+
+                               Log.d("TAG", id+" "+title+" "+image+"\n");
+
+
+                               //find matching ingredients
+                               JSONArray usedArray=currentRecipe.getJSONArray("usedIngredients");
+                            for(int j=0;j<usedArray.length();j++){
+                                JSONObject childObject=usedArray.getJSONObject(j);
+                                String name=childObject.getString("name");
+                                Log.d("TAG", "Uses ingredients:"+name);
+                                missing.add(name);
+                            }
+                            //find missing ingredients
+                               JSONArray missedArray=currentRecipe.getJSONArray("missedIngredients");
+                               for(int l=0;l<missedArray.length();l++){
+                                   JSONObject childObject=missedArray.getJSONObject(l);
+                                   String name=childObject.getString("name");
+                                   Log.d("TAG", "Misses ingredients:"+name);
+                               }
+
+                               mRecipeList.add(new RecipeItem(id,title,image,missing,used));
+
+
+                               //How to extract missing items:
+/*
+                             //  i=position
+                               for(int p=0;p<mRecipeList.get(i).getMissing().size();p++){
+                                   Log.d("TAG", "onResponse: "+mRecipeList.get(i).getMissing().get(p));
+                               }
+*/
+
+                           }
+                       }catch (JSONException e){//couldn't take recipe's attributes
+                           e.printStackTrace();
+                       }
+                   }
+               },
+               new Response.ErrorListener(){
+                   @Override
+                   public void onErrorResponse(VolleyError error){
+error.printStackTrace();
+                   }
+               }
+       );
+      mQueue.add(jsonArrayRequest);
+   }
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    //    saveData();
+    }
+}
+
+
+
+
+
+
+
+
+/*
+    //  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onResponse(JSONObject response) {
+        try {
+            //  Log.d("TAG", "onResponse: "+response);
+            //      loading.setVisibility(View.INVISIBLE);
+            loaded=true;
+            //     content.setVisibility(View.VISIBLE);//hide content while its just empty
+            //  JSONArray jsonArray = response.getJSONArray("recipes");//get the items array from the returned object
+            //   Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
+
+            Log.d("TAG", "response object: "+response);
+/*
+                            //this for loop iterates the array and accesses all the attributes of each individual item
+                            for(int i =0; jsonArray.length()>i;i++){
+                                JSONObject childObject = jsonArray.getJSONObject(i);
+                              String  id = childObject.getString("id");
+                                String title = childObject.getString("title");
+                             String imageUrl = childObject.getString("image");
+                              //  category=childObject.getString("category");
+                               // Log.d("TAG", "JSON tip "+i+" acquired as "+name+" "+body+" "+imageUrl+" "+category);
+
+                            }
+
+
+        } catch (Exception ex) {//for some reason, the try failed.
+            ex.printStackTrace();
+
         }
     }
+}, new Response.ErrorListener() {
+@Override
+public void onErrorResponse(VolleyError error) {//This will be triggered by API not finding product
+        Log.d("TAG", "onErrorResponse: "+error);
+        }
+        });
+        */
+
+
+
+
+
+    /*
     private void buildRecyclerView() {
         mRecyclerView = view.findViewById(R.id.recyclerview);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new IngredientAdapter(mExampleList);
+        mAdapter = new IngredientAdapter(mIngredientList);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
-    }
+    }*/
  /*   private void setInsertButton() {
         Button buttonInsert = view.findViewById(R.id.button_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
@@ -99,16 +276,8 @@ public class Recipes extends Fragment {
             }
         });
     }*/
-    //Going to add item
+//Going to add item
    /* private void insertItem(String line1, String line2, String line3) {
-        mExampleList.add(new IngredientItem(line1, line2,line3));
-        mAdapter.notifyItemInserted(mExampleList.size());
+        mIngredientList.add(new IngredientItem(line1, line2,line3));
+        mAdapter.notifyItemInserted(mIngredientList.size());
     }*/
-
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveData();
-    }
-}
