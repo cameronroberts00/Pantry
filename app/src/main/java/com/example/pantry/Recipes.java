@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -51,9 +52,10 @@ public class Recipes extends Fragment {
     ArrayList<IngredientItem> mIngredientList;
     ArrayList<RecipeItem> mRecipeList;
     private RecyclerView mRecyclerView;
-    private IngredientAdapter mAdapter;
+    private RecipeAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     boolean loaded=false;
+    private LinearLayout empty;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,20 +63,25 @@ public class Recipes extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_recipes, container, false);
         mQueue = Volley.newRequestQueue(getActivity());
+        empty=view.findViewById(R.id.emptyContainer);
         mRecipeList = new ArrayList<>();
-        recipeRecycler=view.findViewById(R.id.recipe_recycler);
+
             loadData();
-           String formatedIngredients=getIngredientString();//Gets a ",+" formatted + concatenated string from user's storage items
-        String url=getUrl(formatedIngredients);
+
 
         if(mIngredientList.size()!=0){//check user has items in their storage before api request
+            String formatedIngredients=getIngredientString();//Gets a ",+" formatted + concatenated string from user's storage items
+            //todo if it cant be fixed, take this one up out of the if statement
+            String url=getUrl(formatedIngredients);
             getRecipes(url);
+            empty.setVisibility(View.INVISIBLE);
         }else{
             //TODO user has no items in storage, tell them here
+            empty.setVisibility(View.VISIBLE);
             Log.d("TAG", "No items found!");
         }
 
-        Log.d("TAG", "Formatted url is: " +url);
+      // Log.d("TAG", "Formatted url is: " +url);
 
 
         return view;
@@ -91,6 +98,20 @@ public class Recipes extends Fragment {
             mIngredientList = new ArrayList<>();
         }
 
+    }
+
+
+    private void buildRecycler(){
+        Log.d("TAG", "in recycler builder ");
+        if (mRecipeList == null) {
+            mRecipeList = new ArrayList<>();
+        }
+        mRecyclerView=view.findViewById(R.id.recipe_recycler);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+        mAdapter = new RecipeAdapter(mRecipeList,getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private String getIngredientString(){
@@ -132,61 +153,68 @@ String apiKey="&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
                new Response.Listener<JSONArray>() {
                    @Override
                    public void onResponse(JSONArray response) {
-                       Log.d("TAG", "Sending request");
+                       Log.d("TAG", response.toString());
                   loaded=true;
-                       try{
-                           for(int i=0;i<response.length();i++){
-                               JSONObject currentRecipe = response.getJSONObject(i);
-                               String id = currentRecipe.getString("id");
-                               String title = currentRecipe.getString("title");
-                               String image = currentRecipe.getString("image");
-                               ArrayList<String> missing=new ArrayList<>();
-                               ArrayList<String> used=new ArrayList<>();
+                  if(response.toString().equals("[]")){   //show user feedback if no results come back. (this can happen if theres only a few obscure or gibberish items in storage)
+                      Log.d("TAG", "It's likely there were no results!");
+                  }else {//if the response is more than empty brackets, proceed to get stuff out of it
+                      try {
+                          for (int i = 0; i < response.length(); i++) {
+                              JSONObject currentRecipe = response.getJSONObject(i);
+                              String id = currentRecipe.getString("id");
+                              String title = currentRecipe.getString("title");
+                              String image = currentRecipe.getString("image");
+                              ArrayList<String> missing = new ArrayList<>();
+                              ArrayList<String> used = new ArrayList<>();
 
-                               Log.d("TAG", id+" "+title+" "+image+"\n");
-
-
-                               //find matching ingredients
-                               JSONArray usedArray=currentRecipe.getJSONArray("usedIngredients");
-                            for(int j=0;j<usedArray.length();j++){
-                                JSONObject childObject=usedArray.getJSONObject(j);
-                                String name=childObject.getString("name");
-                                Log.d("TAG", "Uses ingredients:"+name);
-                                missing.add(name);
-                            }
-                            //find missing ingredients
-                               JSONArray missedArray=currentRecipe.getJSONArray("missedIngredients");
-                               for(int l=0;l<missedArray.length();l++){
-                                   JSONObject childObject=missedArray.getJSONObject(l);
-                                   String name=childObject.getString("name");
-                                   Log.d("TAG", "Misses ingredients:"+name);
-                               }
-
-                               mRecipeList.add(new RecipeItem(id,title,image,missing,used));
+                              Log.d("TAG", id + " " + title + " " + image + "\n");
 
 
-                               //How to extract missing items:
+                              //find matching ingredients
+                              JSONArray usedArray = currentRecipe.getJSONArray("usedIngredients");
+                              for (int j = 0; j < usedArray.length(); j++) {
+                                  JSONObject childObject = usedArray.getJSONObject(j);
+                                  String name = childObject.getString("name");
+                                  Log.d("TAG", "Uses ingredients:" + name);
+                                  missing.add(name);
+                              }
+                              //find missing ingredients
+                              JSONArray missedArray = currentRecipe.getJSONArray("missedIngredients");
+                              for (int l = 0; l < missedArray.length(); l++) {
+                                  JSONObject childObject = missedArray.getJSONObject(l);
+                                  String name = childObject.getString("name");
+                                  Log.d("TAG", "Misses ingredients:" + name);
+                              }
+
+                              mRecipeList.add(new RecipeItem(id, title, image, missing, used));
+
+
+                              //How to extract missing items:
 /*
                              //  i=position
                                for(int p=0;p<mRecipeList.get(i).getMissing().size();p++){
                                    Log.d("TAG", "onResponse: "+mRecipeList.get(i).getMissing().get(p));
                                }
 */
+                              buildRecycler();
+                          }
+                      } catch (JSONException e) {//couldn't take recipe's attributes
+                          e.printStackTrace();
 
-                           }
-                       }catch (JSONException e){//couldn't take recipe's attributes
-                           e.printStackTrace();
-                       }
+                      }
+                  }
                    }
                },
                new Response.ErrorListener(){
                    @Override
                    public void onErrorResponse(VolleyError error){
 error.printStackTrace();
+                      Log.d("TAG", "It's likely there were no results!");
                    }
                }
        );
       mQueue.add(jsonArrayRequest);
+
    }
 
 
