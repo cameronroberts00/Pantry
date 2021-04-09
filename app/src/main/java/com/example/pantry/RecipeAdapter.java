@@ -124,6 +124,7 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
                                 String recipeUrl = response.getString("sourceUrl");
                                 Log.d("TAG", "Loading recipe url: "+recipeUrl);
 
+                                //once web url is gotten, open new intent into web browser
                                 Intent j = new Intent(Intent.ACTION_VIEW);
                                 j.setData(Uri.parse(recipeUrl));
                                 mContext.startActivity(j);

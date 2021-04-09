@@ -46,4 +46,39 @@
             android:text="Recipes will start to appear here once you've added some items!\nTap the '+' icon to get started."
             android:textSize="18sp" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/noResults"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/textView41"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:text="Nothing here! "
+            android:textColor="@color/mainGreen"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView51"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:text="We couldn't find any recipes that match items in your storeroom!\nTap the '+' icon to add some more items."
+            android:textSize="18sp" />
+    </LinearLayout>
 </FrameLayout>

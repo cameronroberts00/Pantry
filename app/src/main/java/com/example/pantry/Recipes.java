@@ -45,7 +45,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 
 public class Recipes extends Fragment {
-
+//todo add no internet error handling
+    //todo add missed and used items to the recipes
     View view;
     private RequestQueue mQueue;
     private RecyclerView recipeRecycler;
@@ -56,6 +57,7 @@ public class Recipes extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     boolean loaded=false;
     private LinearLayout empty;
+    private LinearLayout noResults;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,6 +66,7 @@ public class Recipes extends Fragment {
         view = inflater.inflate(R.layout.fragment_recipes, container, false);
         mQueue = Volley.newRequestQueue(getActivity());
         empty=view.findViewById(R.id.emptyContainer);
+        noResults=view.findViewById(R.id.noResults);
         mRecipeList = new ArrayList<>();
 
             loadData();
@@ -75,7 +78,7 @@ public class Recipes extends Fragment {
             String url=getUrl(formatedIngredients);
             getRecipes(url);
             empty.setVisibility(View.INVISIBLE);
-        }else{
+        }else{//No items in storage
             //TODO user has no items in storage, tell them here
             empty.setVisibility(View.VISIBLE);
             Log.d("TAG", "No items found!");
@@ -131,7 +134,7 @@ public class Recipes extends Fragment {
         String urlStart=" https://api.spoonacular.com/recipes/findByIngredients?number=";
 
         //Controls results returned
-       int resultNumber=5;
+       int resultNumber=25;
 
        //Controls how many used ingredients are returned
         String ranking="&ranking=";
@@ -156,8 +159,10 @@ String apiKey="&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
                        Log.d("TAG", response.toString());
                   loaded=true;
                   if(response.toString().equals("[]")){   //show user feedback if no results come back. (this can happen if theres only a few obscure or gibberish items in storage)
-                      Log.d("TAG", "It's likely there were no results!");
+                     noResults.setVisibility(View.VISIBLE);
+                      Log.d("TAG", "It's likely there were no results");
                   }else {//if the response is more than empty brackets, proceed to get stuff out of it
+                      noResults.setVisibility(View.INVISIBLE);
                       try {
                           for (int i = 0; i < response.length(); i++) {
                               JSONObject currentRecipe = response.getJSONObject(i);
@@ -209,7 +214,7 @@ String apiKey="&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
                    @Override
                    public void onErrorResponse(VolleyError error){
 error.printStackTrace();
-                      Log.d("TAG", "It's likely there were no results!");
+                     // Log.d("TAG", "It's likely there were no results!");
                    }
                }
        );
