@@ -165,12 +165,12 @@ public class Home extends Fragment {
                                 //changes the featured tip once a day
                                Calendar calendar = Calendar.getInstance();
                                int currentDay=calendar.get(Calendar.DAY_OF_MONTH);
-                               SharedPreferences settings = getContext().getSharedPreferences("PREFS", 0);
+                               SharedPreferences settings = Objects.requireNonNull(getContext()).getSharedPreferences("PREFS", 0);
                                int lastDay = settings.getInt("day",0);
                                if(lastDay!=currentDay){
                                    SharedPreferences.Editor editor = settings.edit();
                                    editor.putInt("day",currentDay);
-                                   editor.commit();
+                                   editor.apply();
 
                                    featureRandom(jsonArray,random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
 

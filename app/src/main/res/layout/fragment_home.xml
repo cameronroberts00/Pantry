@@ -38,7 +38,7 @@
                 android:layout_below="@id/recyclerview"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:text="Pick of the Day"
+                android:text="Tip of the Day"
                 android:textColor="@color/mainGreen"
                 android:textSize="24sp"
                 android:textStyle="bold" />

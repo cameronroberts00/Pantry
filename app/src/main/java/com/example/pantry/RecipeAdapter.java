@@ -48,6 +48,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
             //todo declare textviews and container here
             recipeTitle=itemView.findViewById(R.id.title);
             recipeImage=itemView.findViewById(R.id.imageView);
+            missedIngredients=itemView.findViewById(R.id.missingText);
+            usedIngredients=itemView.findViewById(R.id.usedText);
 recipeContainer=itemView.findViewById(R.id.recipe_container);
             mQueue = Volley.newRequestQueue(mContext);
 
@@ -77,8 +79,41 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
 
         holder.recipeTitle.setText(currentItem.getTitle());
         //holder.recipeImage.setText(currentItem.getBody());
-
         Glide.with(mContext).load(currentItem.getImage()).into(holder.recipeImage);
+
+//display the ingredients missiing
+        if (mRecipeList.get(position).getMissing().size()!=0) {
+            holder.missedIngredients.setText("");
+            for (int i = 0; i < mRecipeList.get(position).getMissing().size(); i++) {
+
+                holder.missedIngredients.append(mRecipeList.get(position).getMissing().get(i));
+                if(i!=mRecipeList.get(position).getMissing().size()-1){
+                    holder.missedIngredients.append(", ");
+                }
+                Log.d("TAG", mRecipeList.get(position).getTitle()+" is missing " + mRecipeList.get(position).getMissing().get(i));
+            }
+        }else{
+            holder.missedIngredients.setText("None!");
+        }
+        Log.d("TAG", mRecipeList.get(position).getUsing().toString());
+        //display the ingredients getting used
+        if (mRecipeList.get(position).getUsing().size()!=0) {
+            holder.usedIngredients.setText("");
+            for (int i = 0; i < mRecipeList.get(position).getUsing().size(); i++) {
+                holder.usedIngredients.append(mRecipeList.get(position).getUsing().get(i) );
+                if(i!=mRecipeList.get(position).getUsing().size()-1){
+                    holder.usedIngredients.append(", ");//Only add a comma to items if it isnt the last one. Stops lists going like: Item, item, item,
+                }
+
+
+                Log.d("TAG", mRecipeList.get(position).getTitle()+" is missing " + mRecipeList.get(position).getUsing().get(i));
+            }
+        }else{
+            holder.usedIngredients.setText("None!");
+        }
+
+
+        // holder.usedIngredients.setText();
         // Log.d("TAG", "Loading image: "+currentItem.getmImageUrl());
        // if(holder.tipBody.getText().length()>=50){
       //      clipBody(holder);//clip the text body if its too long

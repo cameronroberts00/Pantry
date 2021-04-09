@@ -287,6 +287,7 @@ Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransacti
         String json = gson.toJson(mIngredientList);
         editor.putString("task list", json);
         editor.apply();
+        category=null;//TODO if categories start messing up, check this line here
     }
 
 
