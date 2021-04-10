@@ -175,8 +175,6 @@ public class Home extends Fragment {
                                    featureRandom(jsonArray,random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
 
                                }else{//if function has already run today, the featured tip has already been chosen, just grab it from shared preferences
-                                   //TODO figure a way to stop it only showing once a day, maybe by saving which one got featured to shared prefs and pulling it here
-
                                    SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
                                    random = randomStorer.getInt("random",0);
                                    //random=//from saved prefs;
@@ -219,7 +217,6 @@ public class Home extends Fragment {
 
        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
        public void featureRandom(JSONArray jsonArray, int random){
-           //todo get random number from array length, when the for loop gets this item, send it to the featured holder
            try {
                if(random==0) {
                    Log.d("TAG", "Random feature wasnt initialised, getting random number and saving it "+random);

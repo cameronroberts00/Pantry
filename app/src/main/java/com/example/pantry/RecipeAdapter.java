@@ -77,9 +77,12 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
     public void onBindViewHolder(final RecipeAdapter.ExampleViewHolder holder, final int position) {
         final RecipeItem currentItem = mRecipeList.get(position);
 
+
+
         holder.recipeTitle.setText(currentItem.getTitle());
         //holder.recipeImage.setText(currentItem.getBody());
         Glide.with(mContext).load(currentItem.getImage()).into(holder.recipeImage);
+
 
 //display the ingredients missiing
         if (mRecipeList.get(position).getMissing().size()!=0) {

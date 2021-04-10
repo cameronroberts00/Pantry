@@ -66,6 +66,7 @@ public class Recipes extends Fragment {
     private ConstraintLayout timeout;
     private ConstraintLayout loading;
     private Button refresh;
+    private Button priority;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,33 +78,41 @@ public class Recipes extends Fragment {
         noResults=view.findViewById(R.id.noResults);
         timeout=view.findViewById(R.id.timeout);
         refresh=view.findViewById(R.id.refresh);
+        priority=view.findViewById(R.id.priority);
         loading=view.findViewById(R.id.loading);
+        recipeRecycler=view.findViewById(R.id.recipe_recycler);
         volleyError=view.findViewById(R.id.volleyError);
         volleyErrorText=view.findViewById(R.id.volleyErrorText);
+
         refresh.setOnClickListener(listener);
+        priority.setOnClickListener(listener);
         mRecipeList = new ArrayList<>();
-        checkTimeout();
-            loadData();
+        checkTimeout();//count to 10 seconds and if content isnt loaded offer user a refresh button and tell em to turn internet on
+            loadData();//get data from shared prefs
+            prepareData();//get everything formatted right and stuff
 
 
-        if(mIngredientList.size()!=0){//check user has items in their storage before api request
-            String formatedIngredients=getIngredientString();//Gets a ",+" formatted + concatenated string from user's storage items
-
-            String url=getUrl(formatedIngredients);
-            getRecipes(url);
-            empty.setVisibility(View.INVISIBLE);
-        }else{//No items in storage
-
-            loading.setVisibility(view.INVISIBLE);
-            empty.setVisibility(View.VISIBLE);
-            Log.d("TAG", "No items found!");
-        }
 
       // Log.d("TAG", "Formatted url is: " +url);
 
 
         return view;
         }
+
+        private void prepareData(){
+            if(mIngredientList.size()!=0){//check user has items in their storage before api request
+                String formatedIngredients=getIngredientString();//Gets a ",+" formatted + concatenated string from user's storage items
+                String url=getUrl(formatedIngredients);
+                getRecipes(url);
+                empty.setVisibility(View.INVISIBLE);
+            }else{//No items in storage
+                loading.setVisibility(View.INVISIBLE);
+                empty.setVisibility(View.VISIBLE);
+                Log.d("TAG", "No items found!");
+            }
+
+        }
+
     private void checkTimeout(){
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
@@ -119,6 +128,8 @@ public class Recipes extends Fragment {
         }, 10000);
     }
 
+
+public boolean prioritise=false;
     View.OnClickListener listener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -128,11 +139,26 @@ public class Recipes extends Fragment {
                     AppCompatActivity reload = (AppCompatActivity) view.getContext();
                     reload.getSupportFragmentManager().beginTransaction().replace(R.id.frame, recipes).addToBackStack(null).commit();
                     break;
+                case R.id.priority:
+                    recipeRecycler.setVisibility(View.INVISIBLE);
+                    loading.setVisibility(View.VISIBLE);
+                    noResults.setVisibility(View.INVISIBLE);
+                    prioritise=!prioritise;//if user wants to prioritise stuff that expires first
+                    mRecipeList = new ArrayList<>();
+                    loadData();
+                    prepareData();
+                    //prioritising happens in getIngredientString
+
+                    //get
+                    Log.d("TAG", "Prioritising almost expired stuff: "+prioritise);
+                    break;
             }
         }
     };
 
     private void loadData() {
+
+
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("task list", null);
@@ -160,14 +186,20 @@ public class Recipes extends Fragment {
 
     private String getIngredientString(){
         String ingredientName="";//This holds all the ingredients concatenated
-        for(int i=0;i<mIngredientList.size();i++) {
-            ingredientName=ingredientName+mIngredientList.get(i).getName()+",+";
-            Log.d("TAG", "Ingredient: "+ingredientName);
-        }
-        //This string holds the concatenated string minus not needed ending
-        String formatedIngredients =  ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
+        String formatedIngredients;
+        if(prioritise){//if user wants to prioritise results on items expiring soon, send the data off to get checked
+            formatedIngredients ="";   //TODO if prioritise is true send data to checker function to get stuff going out of date v soon
+            //TODO get all date items in a for loop, formatted ingredients == ones that go out of date soon
+        }else{
+            for(int i=0;i<mIngredientList.size();i++) {
+                ingredientName=ingredientName+mIngredientList.get(i).getName()+",+";
+                Log.d("TAG", "Ingredient: "+ingredientName);
+            }
+            //This string holds the concatenated string minus not needed ending
+             formatedIngredients =  ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
 
-        Log.d("TAG", "Final ingredient string: "+formatedIngredients);
+            Log.d("TAG", "Final ingredient string: "+formatedIngredients);
+        }
         return formatedIngredients;
     }
 
@@ -200,8 +232,10 @@ String apiKey="&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
                        Log.d("TAG", response.toString());
                   loaded=true;
                   loading.setVisibility(View.INVISIBLE);
+                  recipeRecycler.setVisibility(View.VISIBLE);
                   if(response.toString().equals("[]")){   //show user feedback if no results come back. (this can happen if theres only a few obscure or gibberish items in storage)
                      noResults.setVisibility(View.VISIBLE);
+                      recipeRecycler.setVisibility(View.INVISIBLE);
                       Log.d("TAG", "It's likely there were no results");
                   }else {//if the response is more than empty brackets, proceed to get stuff out of it
                       noResults.setVisibility(View.INVISIBLE);
@@ -271,7 +305,7 @@ try {//Check for known errors (freemium api limit reached etc)
     volleyError.setVisibility(View.VISIBLE);
     volleyErrorText.setText("Oh no, please try the action again.\n" +
             "If the problem persists drop me an email at \ncjr555@york.ac.uk\nPlease include this error code: "+errorCode);
-
+//todo when submitting remove my name here
 }catch (Exception e){
 e.printStackTrace();
 }

@@ -40,6 +40,44 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/buttonHolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Prioritise ingredients expiring soon"
+                android:textColor="@color/mainGreen" />
+
+            <Button
+                android:id="@+id/priority"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                app:backgroundTint="#FFFFFF"
+                app:icon="@mipmap/tickboxunticked_foreground" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recipe_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="614dp"
+            android:layout_below="@id/buttonHolder">
+
+        </androidx.recyclerview.widget.RecyclerView>
+    </RelativeLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/timeout"
         android:layout_width="match_parent"
@@ -74,13 +112,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recipe_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-    </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:id="@+id/emptyContainer"
