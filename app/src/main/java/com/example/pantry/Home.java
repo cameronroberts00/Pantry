@@ -172,15 +172,13 @@ public class Home extends Fragment {
                                    editor.putInt("day",currentDay);
                                    editor.apply();
 
-                                   featureRandom(jsonArray,random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
-
                                }else{//if function has already run today, the featured tip has already been chosen, just grab it from shared preferences
                                    SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
                                    random = randomStorer.getInt("random",0);
                                    //random=//from saved prefs;
                                    Log.d("TAG", "Function already called today, getting random feature from storage "+random);
-                                   featureRandom(jsonArray,random);
                                }
+                               featureRandom(jsonArray,random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
 
                                //this for loop iterates the array and accesses all the attributes of each individual item
                                 for(int i =0; jsonArray.length()>i;i++){

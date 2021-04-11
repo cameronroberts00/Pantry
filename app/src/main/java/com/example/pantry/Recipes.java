@@ -41,8 +41,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -184,22 +188,45 @@ public boolean prioritise=false;
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    //This method handles whether user has priority mode on or off too.
     private String getIngredientString(){
         String ingredientName="";//This holds all the ingredients concatenated
         String formatedIngredients;
         if(prioritise){//if user wants to prioritise results on items expiring soon, send the data off to get checked
-            formatedIngredients ="";   //TODO if prioritise is true send data to checker function to get stuff going out of date v soon
-            //TODO get all date items in a for loop, formatted ingredients == ones that go out of date soon
-        }else{
+           // formatedIngredients ="";   //todo remove this boy
+            try {
+                //Get the current date
+                Calendar calendar= Calendar.getInstance();//make new calendar and set its date to now
+                SimpleDateFormat newDateFormat= new SimpleDateFormat("dd-MM-yyyy");
+                String thisDate = newDateFormat.format(calendar.getTime());
+                Date currentDate = new SimpleDateFormat("dd-MM-yyyy").parse(thisDate);
+                Log.d("TAG", "Day"+String.valueOf(currentDate));
+
+                //Get a date in 3 days time
+                calendar.add(Calendar.DATE, 3);//add 3 days to range
+                String endRangeString=newDateFormat.format(calendar.getTime());//this is the end range of dates we're chcking
+                Date endRange = new SimpleDateFormat("dd-MM-yyyy").parse(endRangeString);
+
+                for (int i=0;i<mIngredientList.size();i++){//Go through each ingredient
+                    Date bestBy=new SimpleDateFormat("dd-MM-yyyy").parse(mIngredientList.get(i).getBestByDate());//get best by for each product
+                    if(bestBy.before(currentDate)||bestBy.after(currentDate)&&bestBy.before(endRange)){  //if best by has passed or it is in less than 3 days time, get the product
+                        ingredientName=ingredientName+mIngredientList.get(i).getName()+",+";//chuck the product on the big ol string that gets sent to the api
+                        Log.d("TAG", "Priority Ingredient: "+ingredientName);
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                Log.d("TAG", "getIngredientString: Couldn't parse priority dates!");
+                //If the user ends up in this catch, they will see the default "no items found!" screen until they disable priority mode.
+            }
+        }else{//if user isnt prioritising items that expire soon, just send their entire storeroom off to recipe getter thing (this is useful to not flood recipes with stuff that uses long shelf life items)
             for(int i=0;i<mIngredientList.size();i++) {
                 ingredientName=ingredientName+mIngredientList.get(i).getName()+",+";
                 Log.d("TAG", "Ingredient: "+ingredientName);
             }
-            //This string holds the concatenated string minus not needed ending
-             formatedIngredients =  ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
-
-            Log.d("TAG", "Final ingredient string: "+formatedIngredients);
         }
+        formatedIngredients =  ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
+        Log.d("TAG", "Final ingredient string: "+formatedIngredients);
         return formatedIngredients;
     }
 
