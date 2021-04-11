@@ -1,6 +1,7 @@
 package com.example.pantry;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -9,10 +10,14 @@ import androidx.fragment.app.Fragment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 
@@ -88,7 +93,7 @@ public class ProgressBar extends Fragment {
                             SystemClock.sleep(100);//pause for a lil mo to show users the bar is completed
                             mProgressStatus = 0;
                             mProgressBar.setProgress(mProgressStatus);
-
+                            triggerPopup();
 
                             save();//save progress on every levelup
 
@@ -114,4 +119,31 @@ public class ProgressBar extends Fragment {
                         "current level: "+currentInt+"\n"+
                         "next level: "+nextInt);
     }
+
+    public void triggerPopup(){
+        LayoutInflater inflater=(LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View popup=inflater.inflate(R.layout.level_up_popup,null);
+
+       // int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+       // int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+        //This converts pixels to dp
+        final float scale = getContext().getResources().getDisplayMetrics().density;
+        int width = (int) (350 * scale + 0.5f);
+        int height =(int) (450 * scale + 0.5f);
+
+        final PopupWindow popupWindow = new PopupWindow(popup,width, height,true);
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+
+        // dismiss the popup window when touched
+        popup.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+
 }

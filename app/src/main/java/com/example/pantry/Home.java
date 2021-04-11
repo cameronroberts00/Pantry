@@ -148,68 +148,76 @@ public class Home extends Fragment {
     }
 
    private void loadContent(){
-       loading.setVisibility(View.VISIBLE);
-           JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                   new Response.Listener<JSONObject>() {
-                       //  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                       @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                       @Override
-                       public void onResponse(JSONObject response) {
-                           try {
-                               loading.setVisibility(View.INVISIBLE);
-                               loaded=true;
-                               content.setVisibility(View.VISIBLE);//hide content while its just empty
-                               JSONArray jsonArray = response.getJSONArray("tips");//get the items array from the returned object
-                               Log.d("TAG", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
+       try {
+            loading.setVisibility(View.VISIBLE);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                    new Response.Listener<JSONObject>() {
+                        //  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                loading.setVisibility(View.INVISIBLE);
+                                loaded = true;
+                                content.setVisibility(View.VISIBLE);//hide content while its just empty
+                                JSONArray jsonArray = response.getJSONArray("tips");//get the items array from the returned object
+                                Log.d("TAG", "onResponse: Got reponse" + jsonArray.toString());//Show full reply in console
 
-                                //changes the featured tip once a day
-                               Calendar calendar = Calendar.getInstance();
-                               int currentDay=calendar.get(Calendar.DAY_OF_MONTH);
-                               SharedPreferences settings = Objects.requireNonNull(getContext()).getSharedPreferences("PREFS", 0);
-                               int lastDay = settings.getInt("day",0);
-                               if(lastDay!=currentDay){
-                                   SharedPreferences.Editor editor = settings.edit();
-                                   editor.putInt("day",currentDay);
-                                   editor.apply();
+                                try {//The user spamming home like, reallly really really quickly will crash the program because shared preferences cant be accessed quick enough. try statement prevents this bug.
+                                    //changes the featured tip once a day
+                                    Calendar calendar = Calendar.getInstance();
+                                    int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+                                    SharedPreferences settings = Objects.requireNonNull(getContext()).getSharedPreferences("PREFS", 0);
+                                    int lastDay = settings.getInt("day", 0);
+                                    if (lastDay != currentDay) {
+                                        SharedPreferences.Editor editor = settings.edit();
+                                        editor.putInt("day", currentDay);
+                                        editor.apply();
+                                    } else {//if function has already run today, the featured tip has already been chosen, just grab it from shared preferences
+                                        SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
+                                        random = randomStorer.getInt("random", 0);
+                                        //random=//from saved prefs;
+                                        Log.d("TAG", "Function already called today, getting random feature from storage " + random);
+                                    }
+                                }catch(Exception e){
+                                    Log.d("TAG", "Failed in date function! "+e);
 
-                               }else{//if function has already run today, the featured tip has already been chosen, just grab it from shared preferences
-                                   SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
-                                   random = randomStorer.getInt("random",0);
-                                   //random=//from saved prefs;
-                                   Log.d("TAG", "Function already called today, getting random feature from storage "+random);
-                               }
-                               featureRandom(jsonArray,random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
+                                    }
+                                featureRandom(jsonArray, random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
 
-                               //this for loop iterates the array and accesses all the attributes of each individual item
-                                for(int i =0; jsonArray.length()>i;i++){
+                                //this for loop iterates the array and accesses all the attributes of each individual item
+                                for (int i = 0; jsonArray.length() > i; i++) {
                                     JSONObject childObject = jsonArray.getJSONObject(i);
                                     name = childObject.getString("name");
                                     body = childObject.getString("body");
                                     imageUrl = childObject.getString("image");
-                                    category=childObject.getString("category");
-                                    Log.d("TAG", "JSON tip "+i+" acquired as "+name+" "+body+" "+imageUrl+" "+category);
+                                    category = childObject.getString("category");
+                                    Log.d("TAG", "JSON tip " + i + " acquired as " + name + " " + body + " " + imageUrl + " " + category);
 
                                     //split the tips into 2 recycler views based on categories in the json
                                     try {
                                         sortCategories(category);//chuck it in a try as spamming home button causes nullpointer exception and a crash when adding stuff to tiplists, if caught it doesnt affect performance
-                                    }catch (Exception e){
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
 
 
-                   }
-                           } catch (JSONException ex) {//for some reason, the try failed.
-                               ex.printStackTrace();
+                                }
+                            } catch (JSONException ex) {//for some reason, the try failed.
+                                ex.printStackTrace();
 
-                           }
-                       }
-                   }, new Response.ErrorListener() {
-               @Override
-               public void onErrorResponse(VolleyError error) {//This will be triggered by API not finding product
-                   Log.d("TAG", "onErrorResponse: "+error);
-               }
-           });
-           mQueue.add(request);//add the call to the volley queue
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {//This will be triggered by API not finding product
+                    Log.d("TAG", "onErrorResponse: " + error);
+                }
+            });
+            mQueue.add(request);//add the call to the volley queue
+        }catch (Exception e){
+            Log.d("TAG", "Failed to get content in home!\n"+e);
+        }
        }
 
 
