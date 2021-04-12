@@ -202,14 +202,18 @@ private static final String TAG="MainActivity";
         public void grabTexts()  {
            name = nameText.getText().toString().trim();//the values saved are trimmed Strings from input fields. (Trimming stops users breaking the items by holding enter for whitespace)
            category = categoryText.getText().toString().trim();
+           if (category.isEmpty()){//if user didnt write a category, just set it to this
+               category="no category";
+           }
 
             //Check user has entered other fields before launching date picker
-            if(name.isEmpty()||category.isEmpty()){
+            //(uncomment "error 2" and add ||category.isEmpty to force category input)
+            if(name.isEmpty()){
                 error1.setVisibility(View.VISIBLE);
-                error2.setVisibility(View.VISIBLE);
+                //error2.setVisibility(View.VISIBLE);
             }else{//if user has got content in the fields, load date picker
                 error1.setVisibility(View.INVISIBLE);
-                error2.setVisibility(View.INVISIBLE);
+               // error2.setVisibility(View.INVISIBLE);
                 AppCompatDialogFragment newFragment = new DatePickerFragment();
                 // set the targetFragment to receive the results, specifying the request code
                 newFragment.setTargetFragment(AddManually.this, REQUEST_CODE);

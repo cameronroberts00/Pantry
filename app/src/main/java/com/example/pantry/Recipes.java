@@ -191,7 +191,7 @@ public boolean prioritise=false;
     //This method handles whether user has priority mode on or off too.
     private String getIngredientString(){
         String ingredientName="";//This holds all the ingredients concatenated
-        String formatedIngredients;
+        String formatedIngredients="";
         if(prioritise){//if user wants to prioritise results on items expiring soon, send the data off to get checked
            // formatedIngredients ="";   //todo remove this boy
             try {
@@ -208,9 +208,11 @@ public boolean prioritise=false;
                 Date endRange = new SimpleDateFormat("dd-MM-yyyy").parse(endRangeString);
 
                 for (int i=0;i<mIngredientList.size();i++){//Go through each ingredient
+                    Log.d("TAG", "Going thru ingredients");
                     Date bestBy=new SimpleDateFormat("dd-MM-yyyy").parse(mIngredientList.get(i).getBestByDate());//get best by for each product
-                    if(bestBy.before(currentDate)||bestBy.after(currentDate)&&bestBy.before(endRange)){  //if best by has passed or it is in less than 3 days time, get the product
+                    if(bestBy.before(currentDate)||bestBy.equals(currentDate)||bestBy.after(currentDate)&&bestBy.before(endRange)){  //if best by has passed or it is in less than 3 days time, get the product
                         ingredientName=ingredientName+mIngredientList.get(i).getName()+",+";//chuck the product on the big ol string that gets sent to the api
+                        formatedIngredients = ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
                         Log.d("TAG", "Priority Ingredient: "+ingredientName);
                     }
                 }
@@ -222,11 +224,21 @@ public boolean prioritise=false;
         }else{//if user isnt prioritising items that expire soon, just send their entire storeroom off to recipe getter thing (this is useful to not flood recipes with stuff that uses long shelf life items)
             for(int i=0;i<mIngredientList.size();i++) {
                 ingredientName=ingredientName+mIngredientList.get(i).getName()+",+";
-                Log.d("TAG", "Ingredient: "+ingredientName);
+                Log.d("TAG", "Non priority Ingredient: "+ingredientName);
+
+                formatedIngredients = ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
+
             }
         }
-        formatedIngredients =  ingredientName.substring(0, ingredientName.length() - 2);//Trim off the last ",+"
-        Log.d("TAG", "Final ingredient string: "+formatedIngredients);
+        Log.d("TAG", "formated ingredients"+ingredientName);
+     //   try {//Sometimes, if loads of gibberish or loads of 1 letter items are in the storeroom, getting to here crashes the app. Used normally there shouldnt be a load of 1 letter products, but just in case, this "catch" will automatically just show a "No recipes found!" screen
+
+            Log.d("TAG", "Final ingredient string: "+formatedIngredients);
+     //   }catch (Exception e){
+        //    e.printStackTrace();
+     //   }
+
+
         return formatedIngredients;
     }
 
