@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -70,7 +71,8 @@ public class Recipes extends Fragment {
     private ConstraintLayout timeout;
     private ConstraintLayout loading;
     private Button refresh;
-    private Button priority;
+  //  private Button priority;
+    private ImageView priorityButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,14 +84,17 @@ public class Recipes extends Fragment {
         noResults=view.findViewById(R.id.noResults);
         timeout=view.findViewById(R.id.timeout);
         refresh=view.findViewById(R.id.refresh);
-        priority=view.findViewById(R.id.priority);
+       // priority=view.findViewById(R.id.priority);
         loading=view.findViewById(R.id.loading);
         recipeRecycler=view.findViewById(R.id.recipe_recycler);
         volleyError=view.findViewById(R.id.volleyError);
         volleyErrorText=view.findViewById(R.id.volleyErrorText);
+        priorityButton=view.findViewById(R.id.priority_button);
+        priorityButton.setBackgroundResource(R.mipmap.tickboxunticked_foreground);
 
         refresh.setOnClickListener(listener);
-        priority.setOnClickListener(listener);
+      //  priority.setOnClickListener(listener);
+        priorityButton.setOnClickListener(listener);
         mRecipeList = new ArrayList<>();
         checkTimeout();//count to 10 seconds and if content isnt loaded offer user a refresh button and tell em to turn internet on
             loadData();//get data from shared prefs
@@ -122,10 +127,11 @@ public class Recipes extends Fragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(loaded==false){
-                    //if content hasnt loading in 10 seconds, tell user to refresh
+                if(!loaded&&mIngredientList.size()!=0){
+                    //if content hasnt loading in 10 seconds, tell user to refresh, dont show if nowt in ingredient list anyway as refresh wouldnt fix that
                     Log.d("TAG", "Hasn't loaded in 10 seconds, offer refresh.");
                     loading.setVisibility(View.INVISIBLE);
+                    noResults.setVisibility(View.INVISIBLE);
                     timeout.setVisibility(View.VISIBLE);
                 }
             }
@@ -143,11 +149,16 @@ public boolean prioritise=false;
                     AppCompatActivity reload = (AppCompatActivity) view.getContext();
                     reload.getSupportFragmentManager().beginTransaction().replace(R.id.frame, recipes).addToBackStack(null).commit();
                     break;
-                case R.id.priority:
+                case R.id.priority_button:
                     recipeRecycler.setVisibility(View.INVISIBLE);
                     loading.setVisibility(View.VISIBLE);
                     noResults.setVisibility(View.INVISIBLE);
                     prioritise=!prioritise;//if user wants to prioritise stuff that expires first
+                    if(prioritise){
+                        priorityButton.setBackgroundResource(R.mipmap.tickboxticked_foreground);
+                    }else{
+                        priorityButton.setBackgroundResource(R.mipmap.tickboxunticked_foreground);
+                    }
                     mRecipeList = new ArrayList<>();
                     loadData();
                     prepareData();
@@ -165,7 +176,7 @@ public boolean prioritise=false;
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
-        String json = sharedPreferences.getString("task list", null);
+        String json = sharedPreferences.getString("ingredient list", null);
         Type type = new TypeToken<ArrayList<IngredientItem>>() {}.getType();
         mIngredientList = gson.fromJson(json, type);
         if (mIngredientList == null) {

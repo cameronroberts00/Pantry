@@ -62,13 +62,13 @@ public class Storeroom extends Fragment {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(mIngredientList);
-        editor.putString("task list", json);
+        editor.putString("ingredient list", json);
         editor.apply();
     }
     private void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
-        String json = sharedPreferences.getString("task list", null);
+        String json = sharedPreferences.getString("ingredient list", null);
         Type type = new TypeToken<ArrayList<IngredientItem>>() {}.getType();
         mIngredientList = gson.fromJson(json, type);
         if (mIngredientList == null) {
