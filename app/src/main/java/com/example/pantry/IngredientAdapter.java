@@ -63,8 +63,10 @@ public void removeIngredient(int position){
         //User spam tapping "delete" button causes Array out of bounds exception and crashes app. try/catch fixes it
             try {
                 mIngredientList.remove(position);
+
                 notifyItemRemoved(position);
                 notifyItemChanged(position);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.d("TAG", "caught in removeIngredient func");

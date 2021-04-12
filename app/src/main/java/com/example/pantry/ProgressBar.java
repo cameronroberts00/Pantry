@@ -1,14 +1,20 @@
 package com.example.pantry;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.SystemClock;
+import android.transition.Explode;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -31,7 +38,9 @@ public class ProgressBar extends Fragment {
     int currentInt;//=0;
     int nextInt;//=1;
     private int mProgressStatus;//=0;
-
+    Button okay;
+    TextView bigLevel;
+    TextView longLevel;
     TinyDB tinyDB;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,11 +87,13 @@ public class ProgressBar extends Fragment {
                         @Override
                         public void run() {
                            mProgressBar.setProgress(mProgressStatus);
+
                         }
                     });
               //  }
                 if(mProgressStatus>=100) {//if user is at 100, let them level up.
                     mHandler.post(new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.M)
                         @Override//this handles after the progress bar has updated
                         public void run() {
                             //increment the levels
@@ -120,28 +131,57 @@ public class ProgressBar extends Fragment {
                         "next level: "+nextInt);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void triggerPopup(){
         LayoutInflater inflater=(LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View popup=inflater.inflate(R.layout.level_up_popup,null);
+        final View popup=inflater.inflate(R.layout.level_up_popup,null);
+        okay=popup.findViewById(R.id.okay);
+        bigLevel=popup.findViewById(R.id.big_level);
+        longLevel=popup.findViewById(R.id.long_level_text);
 
-       // int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-       // int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        bigLevel.setText(String.valueOf(currentInt));//fill in the textviews
+        longLevel.setText("You are now level "+ String.valueOf(currentInt));
 
-        //This converts pixels to dp
-        final float scale = getContext().getResources().getDisplayMetrics().density;
-        int width = (int) (350 * scale + 0.5f);
-        int height =(int) (450 * scale + 0.5f);
-
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         final PopupWindow popupWindow = new PopupWindow(popup,width, height,true);
+        popupWindow.setEnterTransition(new Slide());
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
+        //Entry animation for the big level textview
+        bigLevel.setAlpha(0.0f);
+        bigLevel.animate()
+                .translationX(60)
+                .alpha(0.0f)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        bigLevel.animate()
+                                .translationX(0)
+                                .alpha(1.0f)
+                                .setListener(null).setDuration(300);
+                    }
+                });
 
-        // dismiss the popup window when touched
-        popup.setOnTouchListener(new View.OnTouchListener() {
+        // dismiss on click of "okay" with a nice lil exit
+        okay.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                popupWindow.dismiss();
-                return true;
+            public void onClick(View view) {
+                //animate an exit on the big level textview then close the popup
+                bigLevel.animate()
+                        .translationX(-60)
+                        .alpha(0.0f).setDuration(300)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @RequiresApi(api = Build.VERSION_CODES.M)
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                popupWindow.setExitTransition(new Slide());
+                                popupWindow.dismiss();
+                            }
+                        });
+
             }
         });
     }
