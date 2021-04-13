@@ -68,6 +68,7 @@ public class Recipes extends Fragment {
     private LinearLayout noResults;
     private LinearLayout volleyError;
     private TextView volleyErrorText;
+    private TextView priorityList;
     private ConstraintLayout timeout;
     private ConstraintLayout loading;
     private Button refresh;
@@ -90,6 +91,7 @@ public class Recipes extends Fragment {
         volleyError=view.findViewById(R.id.volleyError);
         volleyErrorText=view.findViewById(R.id.volleyErrorText);
         priorityButton=view.findViewById(R.id.priority_button);
+        priorityList=view.findViewById(R.id.priotity_list);
         priorityButton.setBackgroundResource(R.mipmap.tickboxunticked_foreground);
 
         refresh.setOnClickListener(listener);
@@ -156,8 +158,10 @@ public boolean prioritise=false;
                     prioritise=!prioritise;//if user wants to prioritise stuff that expires first
                     if(prioritise){
                         priorityButton.setBackgroundResource(R.mipmap.tickboxticked_foreground);
+                        priorityList.setVisibility(View.VISIBLE);
                     }else{
                         priorityButton.setBackgroundResource(R.mipmap.tickboxunticked_foreground);
+                        priorityList.setVisibility(View.INVISIBLE);
                     }
                     mRecipeList = new ArrayList<>();
                     loadData();
@@ -227,6 +231,10 @@ public boolean prioritise=false;
                         Log.d("TAG", "Priority Ingredient: "+ingredientName);
                     }
                 }
+                if(formatedIngredients.length()!=0){//if we have prioritised something, tell the user
+                    priorityList.setText("Prioritising your: "+formatedIngredients.replace("+"," "));//Take the '+' off that the api needs so its nicer looking to a user
+                }else{priorityList.setVisibility(View.INVISIBLE);}
+
             }catch (Exception e){
                 e.printStackTrace();
                 Log.d("TAG", "getIngredientString: Couldn't parse priority dates!");
