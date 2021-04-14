@@ -89,7 +89,7 @@ public class Storeroom extends Fragment {
         mRecyclerView = view.findViewById(R.id.recyclerview);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new IngredientAdapter(mIngredientList);
+        mAdapter = new IngredientAdapter(mIngredientList,getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
     //    testy();

@@ -74,7 +74,7 @@ public class Recipes extends Fragment {
     private Button refresh;
   //  private Button priority;
     private ImageView priorityButton;
-
+    public boolean prioritise=false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -141,7 +141,7 @@ public class Recipes extends Fragment {
     }
 
 
-public boolean prioritise=false;
+
     View.OnClickListener listener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -176,8 +176,6 @@ public boolean prioritise=false;
     };
 
     private void loadData() {
-
-
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("ingredient list", null);

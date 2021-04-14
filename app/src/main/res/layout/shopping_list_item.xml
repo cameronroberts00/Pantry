@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="20dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="63dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="9dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:textSize="12sp"
+            app:backgroundTint="@color/errorCodeRed"
+            app:cornerRadius="20dp"
+            app:icon="@mipmap/bin_foreground"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="50dp" />
+
+        <ImageView
+            android:id="@+id/productPhoto"
+            android:layout_width="62dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="-1dp"
+            android:layout_marginLeft="-1dp"
+            android:layout_marginBottom="0dp"
+            android:scaleType="centerCrop"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <TextView
+            android:id="@+id/product_name"
+            android:layout_width="195dp"
+            android:layout_height="55dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="11dp"
+            android:layout_marginLeft="11dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginEnd="11dp"
+            android:layout_marginRight="11dp"
+            android:layout_toStartOf="@+id/deleteButton"
+            android:layout_toLeftOf="@+id/deleteButton"
+            android:layout_toEndOf="@+id/productPhoto"
+            android:layout_toRightOf="@+id/productPhoto"
+            android:text="Product Name"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

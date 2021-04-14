@@ -8,7 +8,7 @@
     <item
         android:id="@+id/shopping"
         android:title="Shopping List"
-        android:icon="@drawable/ic_launcher_foreground"/>
+        android:icon="@mipmap/shopping_foreground"/>
 
     <item
         android:id="@+id/empty"

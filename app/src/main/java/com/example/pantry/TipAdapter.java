@@ -63,7 +63,7 @@ public void openTip(int position,TipAdapter.ExampleViewHolder holder,View view){
     //Grab the clicked item's info and send it to a new fragment to view
     String name = mTipList.get(position).getName();
     String body=mTipList.get(position).getBody();
-    String image=mTipList.get(position).getmImageUrl();
+    String image=mTipList.get(position).getImageUrl();
 
     Fragment openedTip = new OpenedTip();
     AppCompatActivity activity = (AppCompatActivity) view.getContext();
@@ -105,7 +105,7 @@ public void openTip(int position,TipAdapter.ExampleViewHolder holder,View view){
         holder.tipName.setText(currentItem.getName());
          holder.tipBody.setText(currentItem.getBody());
 
-        Glide.with(mContext).load(currentItem.getmImageUrl()).into(holder.tipImage);
+        Glide.with(mContext).load(currentItem.getImageUrl()).into(holder.tipImage);
        // Log.d("TAG", "Loading image: "+currentItem.getmImageUrl());
         if(holder.tipBody.getText().length()>=50){
             clipBody(holder);//clip the text body if its too long

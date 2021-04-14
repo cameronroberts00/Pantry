@@ -1,5 +1,6 @@
 package com.example.pantry;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -26,6 +27,9 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,23 +45,45 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
         public TextView productBestByDate;
         public TextView expired;
         final public Button deleteButton;
+        final public Button savedItemButton;
         public ExampleViewHolder(View itemView) {
             super(itemView);
             productName = itemView.findViewById(R.id.product_name);
             productCategory = itemView.findViewById(R.id.product_category);
             productBestByDate=itemView.findViewById(R.id.product_bestby);
             expired=itemView.findViewById(R.id.expired);
-            deleteButton = itemView.findViewById(R.id.deleteButton);//delete button needs to go here as it removes the arraylist item and the recycler item made from the arraylist
-            deleteButton.setOnClickListener(new View.OnClickListener(){
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                @Override
-                public void onClick(View view) {
-                    removeIngredient(getAdapterPosition());//Remove ingredient on button click for location of current recycler thing
-                }
-            });
-        }
-    }
+            deleteButton = itemView.findViewById(R.id.deleteButton);
+            savedItemButton=itemView.findViewById(R.id.savedButton);
+            deleteButton.setOnClickListener(listener);
+            savedItemButton.setOnClickListener(listener);
 
+        }
+        View.OnClickListener listener = new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View view) {
+                switch(view.getId()){
+                    case R.id.deleteButton://user timed out, this reloads frag
+                        //called if user binned an item
+                        removeIngredient(getAdapterPosition());
+                        break;
+                    case R.id.savedButton:
+                        //Called if user saved an item
+                        FragmentManager fm = ((AppCompatActivity)mContext).getSupportFragmentManager();
+                        ProgressBar frag = (ProgressBar) fm.findFragmentById(R.id.progressFrame);
+                        if (frag != null) {
+                            frag.updateProgress();
+                        }
+                        removeIngredient(getAdapterPosition());
+                        break;
+                }
+                if(mIngredientList.size()==0){//if user has just deleted the last item, refresh the storeroom to show the "no items screen"
+                    Storeroom storeroom = new Storeroom();
+                    ((AppCompatActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.frame,storeroom).addToBackStack(null).commit();
+                }
+            }
+        };
+    }
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public void removeIngredient(int position){
         //User spam tapping "delete" button causes Array out of bounds exception and crashes app. try/catch fixes it
@@ -75,9 +101,10 @@ public void removeIngredient(int position){
 
 }
 
+public Context mContext;
 
-
-    public IngredientAdapter(ArrayList<IngredientItem> ingredientList) {
+    public IngredientAdapter(ArrayList<IngredientItem> ingredientList,Context context) {
+        mContext=context;
         mIngredientList = ingredientList;
     }
 

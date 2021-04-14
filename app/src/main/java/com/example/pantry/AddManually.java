@@ -59,7 +59,8 @@ private static final String TAG="MainActivity";
    String name;
     String category;
     FragmentManager fm;
-    public static final int REQUEST_CODE = 11; // Used to identify the result
+    ArrayList<IngredientItem> mIngredientList;
+    public static final int REQUEST_CODE = 11; // Used to identify the result to do wit date picker thing
 
     private OnFragmentInteractionListener mListener;
 
@@ -153,7 +154,7 @@ private static final String TAG="MainActivity";
             void onFragmentInteraction(Uri uri);
 
         }
-    ArrayList<IngredientItem> mIngredientList;
+
 
     private void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);

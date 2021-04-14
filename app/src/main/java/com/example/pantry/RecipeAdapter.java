@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,13 +29,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleViewHolder> {
     public ArrayList<RecipeItem>mRecipeList;
     private Context mContext;
     public CardView recipeContainer;
+    public Button addToShopping;
     private RequestQueue mQueue;
     public class ExampleViewHolder extends RecyclerView.ViewHolder{
         public TextView recipeTitle;
@@ -50,6 +54,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
             recipeImage=itemView.findViewById(R.id.imageView);
             missedIngredients=itemView.findViewById(R.id.missingText);
             usedIngredients=itemView.findViewById(R.id.usedText);
+            addToShopping=itemView.findViewById(R.id.add_to_shopping);
 recipeContainer=itemView.findViewById(R.id.recipe_container);
             mQueue = Volley.newRequestQueue(mContext);
 
@@ -78,64 +83,74 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
         final RecipeItem currentItem = mRecipeList.get(position);
 
 
-
         holder.recipeTitle.setText(currentItem.getTitle());
         //holder.recipeImage.setText(currentItem.getBody());
         Glide.with(mContext).load(currentItem.getImage()).into(holder.recipeImage);
 
 
 //display the ingredients missiing
-        if (mRecipeList.get(position).getMissing().size()!=0) {
+        if (mRecipeList.get(position).getMissing().size() != 0) {
             holder.missedIngredients.setText("");
             for (int i = 0; i < mRecipeList.get(position).getMissing().size(); i++) {
 
                 holder.missedIngredients.append(mRecipeList.get(position).getMissing().get(i));
-                if(i!=mRecipeList.get(position).getMissing().size()-1){
+                if (i != mRecipeList.get(position).getMissing().size() - 1) {
                     holder.missedIngredients.append(", ");
                 }
-                Log.d("TAG", mRecipeList.get(position).getTitle()+" is missing " + mRecipeList.get(position).getMissing().get(i));
+                Log.d("TAG", mRecipeList.get(position).getTitle() + " is missing " + mRecipeList.get(position).getMissing().get(i));
             }
-        }else{
+        } else {
             holder.missedIngredients.setText("None!");
         }
         Log.d("TAG", mRecipeList.get(position).getUsing().toString());
         //display the ingredients getting used
-        if (mRecipeList.get(position).getUsing().size()!=0) {
+        if (mRecipeList.get(position).getUsing().size() != 0) {
             holder.usedIngredients.setText("");
             for (int i = 0; i < mRecipeList.get(position).getUsing().size(); i++) {
-                holder.usedIngredients.append(mRecipeList.get(position).getUsing().get(i) );
-                if(i!=mRecipeList.get(position).getUsing().size()-1){
+                holder.usedIngredients.append(mRecipeList.get(position).getUsing().get(i));
+                if (i != mRecipeList.get(position).getUsing().size() - 1) {
                     holder.usedIngredients.append(", ");//Only add a comma to items if it isnt the last one. Stops lists going like: Item, item, item,
                 }
 
 
-                Log.d("TAG", mRecipeList.get(position).getTitle()+" is missing " + mRecipeList.get(position).getUsing().get(i));
+                Log.d("TAG", mRecipeList.get(position).getTitle() + " is missing " + mRecipeList.get(position).getUsing().get(i));
             }
-        }else{
+        } else {
             holder.usedIngredients.setText("None!");
         }
 
 
         // holder.usedIngredients.setText();
         // Log.d("TAG", "Loading image: "+currentItem.getmImageUrl());
-       // if(holder.tipBody.getText().length()>=50){
-      //      clipBody(holder);//clip the text body if its too long
-       // }
+        // if(holder.tipBody.getText().length()>=50){
+        //      clipBody(holder);//clip the text body if its too long
+        // }
 
+        //There's two onclick listeners here instead of one just because it really was not having a fun time with 1 listener and a switch statement
         recipeContainer.setOnClickListener(new View.OnClickListener() {//if a tip is clicked, open it
             @Override
             public void onClick(View view) {
-                Log.d("TAG", "clicked "+holder.getAdapterPosition()+" "+currentItem.getTitle()+" "+currentItem.getId());
+                Log.d("TAG", "clicked " + holder.getAdapterPosition() + " " + currentItem.getTitle() + " " + currentItem.getId());
                 getWebUrl(currentItem.getId());
-              //  openTip(position,holder,view);
+                //  openTip(position,holder,view);
                 //todo get url from id here then open it
+            }
+        });
+
+        addToShopping.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gg++;
+                Log.d("TAG", "Adding to shopping list: "+gg);
+                //todo call to method that adds to the shopping list
             }
         });
         // holder.productBestByDate.setText(currentItem.getBestByDate());
         // holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
         // Log.d("TAG", "Tip name"+currentItem.getName());
-    }
 
+    }
+int gg=0;
     @Override
     public int getItemCount() {
         return mRecipeList.size();

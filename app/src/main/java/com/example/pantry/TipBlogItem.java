@@ -21,7 +21,7 @@ public class TipBlogItem {
     public String getBody(){
         return mBody;
     }
-    public String getmImageUrl(){
+    public String getImageUrl(){
         return  mImageUrl;
     }
 

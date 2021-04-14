@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/recipe_container"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:minHeight="200dp"
+    android:layout_height="220dp"
     android:layout_margin="4dp"
+    android:minHeight="200dp"
     app:cardCornerRadius="20dp"
     tools:layout_editor_absoluteX="10dp"
     tools:layout_editor_absoluteY="199dp">
@@ -14,6 +14,23 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/add_to_shopping"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="11dp"
+            android:layout_marginRight="11dp"
+            android:layout_marginBottom="3dp"
+            android:text="add missing items to shopping list"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            app:backgroundTint="@color/genericButton"
+            app:cornerRadius="20dp"
+            app:iconPadding="4dp" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -24,20 +41,6 @@
             android:layout_marginBottom="0dp"
             android:scaleType="centerCrop"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/usedText"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginStart="151dp"
-            android:layout_marginLeft="151dp"
-            android:layout_marginBottom="-1dp"
-            android:text="Ingredient Match:"
-            android:textColor="@color/mainGreen"
-            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textView12"
@@ -70,12 +73,12 @@
             android:id="@+id/missingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/add_to_shopping"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="150dp"
-            android:layout_marginLeft="150dp"
-            android:layout_marginBottom="9dp"
+            android:layout_marginStart="152dp"
+            android:layout_marginLeft="152dp"
+            android:layout_marginBottom="4dp"
             android:text="Apple, Cheese, Crackers"
             android:textSize="12sp" />
 
@@ -91,6 +94,20 @@
             android:layout_toRightOf="@+id/imageView"
             android:text="Prosciuto and apple crackers"
             android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/usedText"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="151dp"
+            android:layout_marginLeft="151dp"
+            android:layout_marginBottom="-1dp"
+            android:text="Ingredient Match:"
+            android:textColor="@color/mainGreen"
             android:textStyle="bold" />
     </RelativeLayout>
 
