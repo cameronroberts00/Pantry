@@ -46,6 +46,7 @@ public class Shopping extends Fragment {
     View view;
     EditText input;
     TextView showSaveText;
+    TextView requiredText;
     Button saveButton;
     String userInput;
     String url;
@@ -64,6 +65,7 @@ public class Shopping extends Fragment {
         saveButton = view.findViewById(R.id.addButton);
         saveButton.setOnClickListener(listener);
         showSaveText=view.findViewById(R.id.saveText);
+        requiredText=view.findViewById(R.id.required);
         mQueue = Volley.newRequestQueue(getActivity());
         loadData();
         buildRecycler();
@@ -92,10 +94,16 @@ public class Shopping extends Fragment {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.addButton:
-                    getUrl();
-                    Log.d("TAG", "onClick: "+url);
-                    searchItem();//search for users item to find appropriate photo and aisle info for them
-                    clearField();
+                    if(!input.getText().toString().trim().isEmpty()){//if input isnt just space characters or is empty
+                        getUrl();
+                        Log.d("TAG", "onClick: "+url);
+                        searchItem();//search for users item to find appropriate photo and aisle info for them
+                        clearField();
+                        requiredText.setVisibility(View.INVISIBLE);
+                    }else{
+                        requiredText.setVisibility(View.VISIBLE);
+                    }
+
                     break;
             }
         }
@@ -117,30 +125,34 @@ public class Shopping extends Fragment {
                             Log.d("TAG", "onResponse: Got reponse" + jsonArray.toString());//Show full reply in console
                             if(jsonArray.toString().equals("[]")){
                                 Log.d("TAG", "Nothing found for item");
-                                image=" ";//this image=null is received in adapter to set a default image
+                                //image=" ";//this image=null is received in adapter to set a default image
                             }else {
                                 JSONObject childObject = jsonArray.getJSONObject(0);//Just grab the first child as this will be what matches user's search best
                                 image = imageLocation + childObject.getString("image");
                                 Log.d("TAG", "Item logged as\nName: " + userInput + " " + "\nImage: " + image);
                             }
-                            Log.d("TAG", "User input added as "+userInput+" "+image);
-                            addItem(userInput, image);
+
+                          //  addItem(userInput, image);
 
 
                         } catch (JSONException ex) {//for some reason, the try failed.
                             ex.printStackTrace();
-
+//image=" ";
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {//This will be triggered by API not finding product
                 Log.d("TAG", "onErrorResponse: " + error);
+              //  image=" ";
             }
         });
+        //TODO if owts wrong, reset image back to what it was - " "
         mQueue.add(request);//add the call to the volley queue
-
+        Log.d("TAG", "User input added as "+userInput+" "+image);
+        addItem(userInput, image);
     }
+
 private void getUrl(){
         String urlStart="https://api.spoonacular.com/food/ingredients/search?query=";
         String urlEnd="&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
@@ -150,6 +162,7 @@ private void getUrl(){
 
 }
     private void addItem(String name, String image){
+       // image="";//image is gotten in the adapter class, just pass an empty image for now
         mShoppingList.add(new ShoppingListItem(name,image));
         mAdapter.notifyItemInserted(mAdapter.getItemCount()+1);
         save();//do save

@@ -45,8 +45,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
     private Context mContext;
     public CardView recipeContainer;
     public Button addToShopping;
-    private RequestQueue mQueue;
+    private RequestQueue mQueue,mQueue2;
     public ArrayList<ShoppingListItem> mShoppingList;
+    public String image;//(this is image address sent as string to the shopping list for missing items)
     public class ExampleViewHolder extends RecyclerView.ViewHolder{
         public TextView recipeTitle;
         public TextView missedIngredients;
@@ -64,7 +65,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
             addToShopping=itemView.findViewById(R.id.add_to_shopping);
 recipeContainer=itemView.findViewById(R.id.recipe_container);
             mQueue = Volley.newRequestQueue(mContext);
-
+            mQueue2 = Volley.newRequestQueue(mContext);
 
 
         }
@@ -164,11 +165,69 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
         currentItem.getMissing();
         String[] splitMissing=currentItem.getMissing().toString().replace("[","").replace("]","").split(", ");
         for(int i=0;i<splitMissing.length;i++){
-            mShoppingList.add(new ShoppingListItem(splitMissing[i]," "));
-            Log.d("TAG", "Missing item added as: "+i);
+            getImage(splitMissing[i]);
         }
         save();
     }
+
+
+    private void getImage(String i){
+        final String name=i;
+
+        String urlStart="https://api.spoonacular.com/food/ingredients/search?query=";
+        String urlEnd="&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
+        String url;
+        url=urlStart+name+urlEnd;
+        final String imageLocation="https://spoonacular.com/cdn/ingredients_100x100/";
+        Log.d("TAG", "Requesting missing items as: "+i+"\n"+url);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                    new Response.Listener<JSONObject>() {
+                        //  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                //  loading.setVisibility(View.INVISIBLE);
+                                // loaded = true;
+                                //     content.setVisibility(View.VISIBLE);//hide content while its just empty
+
+                                JSONArray jsonArray = response.getJSONArray("results");//get the items array from the returned object
+                                Log.d("TAG", "onResponse: Got reponse" + jsonArray.toString());//Show full reply in console
+                                if(jsonArray.toString().equals("[]")){
+                                    Log.d("TAG", "Nothing found for item");
+                                    image=" ";//this image=null is received in adapter to set a default image
+                                }else {
+                                    JSONObject childObject = jsonArray.getJSONObject(0);//Just grab the first child as this will be what matches user's search best
+                                    image = imageLocation + childObject.getString("image");
+                                    Log.d("TAG", "Item logged as\nName: " + name + " " + "\nImage: " + image);
+                                }
+                                Log.d("TAG", "User input added as "+name+" "+image);
+                              //  addItem(userInput, image);
+                                mShoppingList.add(new ShoppingListItem(name,image));
+                                save();
+                            } catch (JSONException ex) {//for some reason, the try failed.
+                                ex.printStackTrace();
+
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {//This will be triggered by API not finding product
+                    Log.d("TAG", "onErrorResponse: " + error);
+                }
+            });
+            mQueue2.add(request);//add the call to the volley queue
+
+    }
+
+
+
+
+
+
+
+
+
 
     private void save(){
         SharedPreferences sharedPreferences = mContext.getSharedPreferences("shared preferences", MODE_PRIVATE);

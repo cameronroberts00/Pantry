@@ -73,18 +73,19 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
        ShoppingListAdapter.ExampleViewHolder evh = new ExampleViewHolder(v);
         return evh;
     }
-
+ShoppingListAdapter.ExampleViewHolder mHolder;
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onBindViewHolder(ShoppingListAdapter.ExampleViewHolder holder, int position) {
 
         ShoppingListItem currentItem = mShoppingList.get(position);
+mHolder=holder;
         holder.productName.setText(currentItem.getName());
 
         Log.d("TAG", "onBindViewHolder: "+mShoppingList.get(position).getImage());
         try{
 
-        if(!currentItem.getImage().equals(" ")){//if we have an image for it, show it
+        if(currentItem.getImage()!=null){//if we have an image for it, show it
             Glide.with(mContext).load(currentItem.getImage()).into(holder.productPhoto);
         }else{//if theres no image found for product, show locally sourced image (in case of no internet)
             Log.d("TAG", "No photo received for "+mShoppingList.get(position).getName()+", loading default");
@@ -113,6 +114,7 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
             e.printStackTrace();
             Log.d("TAG", "Couldnt remove ingredient");
         }
+
     }
 
 
