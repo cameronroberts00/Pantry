@@ -2,6 +2,7 @@ package com.example.pantry;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -21,11 +22,14 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import androidx.annotation.RequiresApi;
@@ -34,12 +38,15 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleViewHolder> {
     public ArrayList<RecipeItem>mRecipeList;
     private Context mContext;
     public CardView recipeContainer;
     public Button addToShopping;
     private RequestQueue mQueue;
+    public ArrayList<ShoppingListItem> mShoppingList;
     public class ExampleViewHolder extends RecyclerView.ViewHolder{
         public TextView recipeTitle;
         public TextView missedIngredients;
@@ -59,12 +66,14 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
             mQueue = Volley.newRequestQueue(mContext);
 
 
+
         }
     }
 
     public RecipeAdapter(ArrayList<RecipeItem> RecipeList, Context context){
         mContext=context;
         mRecipeList=RecipeList;
+        loadData();
     }
 
     @Override
@@ -140,9 +149,8 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
         addToShopping.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gg++;
-                Log.d("TAG", "Adding to shopping list: "+gg);
-                //todo call to method that adds to the shopping list
+                Log.d("TAG", "Adding to shopping list: "+currentItem.getMissing());
+                addMissingToShopping(currentItem);
             }
         });
         // holder.productBestByDate.setText(currentItem.getBestByDate());
@@ -150,7 +158,39 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
         // Log.d("TAG", "Tip name"+currentItem.getName());
 
     }
-int gg=0;
+
+    private void addMissingToShopping(RecipeItem currentItem){
+        //This grabs all the missing items off the current item (as user clicked it), then takes them apart so theyre individual items and adds them to their shopping list
+        currentItem.getMissing();
+        String[] splitMissing=currentItem.getMissing().toString().replace("[","").replace("]","").split(", ");
+        for(int i=0;i<splitMissing.length;i++){
+            mShoppingList.add(new ShoppingListItem(splitMissing[i]," "));
+            Log.d("TAG", "Missing item added as: "+i);
+        }
+        save();
+    }
+
+    private void save(){
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(mShoppingList);
+        editor.putString("shopping list", json);
+        editor.apply();
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("shopping list", null);
+        Type type = new TypeToken<ArrayList<ShoppingListItem>>() {}.getType();
+        mShoppingList = gson.fromJson(json, type);
+        if (mShoppingList == null) {
+            mShoppingList = new ArrayList<>();
+        }
+        // sharedPreferences.edit().remove("shopping list").commit();
+    }
+
     @Override
     public int getItemCount() {
         return mRecipeList.size();

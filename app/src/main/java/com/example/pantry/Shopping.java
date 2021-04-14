@@ -151,6 +151,7 @@ private void getUrl(){
 }
     private void addItem(String name, String image){
         mShoppingList.add(new ShoppingListItem(name,image));
+        mAdapter.notifyItemInserted(mAdapter.getItemCount()+1);
         save();//do save
     }
 

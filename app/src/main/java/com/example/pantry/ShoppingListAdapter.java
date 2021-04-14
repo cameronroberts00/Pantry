@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -62,7 +64,9 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
     public ShoppingListAdapter(ArrayList<ShoppingListItem> shoppingList, Context context) {
         mContext=context;
         mShoppingList = shoppingList;
+
     }
+
     @Override
     public ShoppingListAdapter.ExampleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.shopping_list_item, parent, false);
@@ -73,6 +77,7 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onBindViewHolder(ShoppingListAdapter.ExampleViewHolder holder, int position) {
+
         ShoppingListItem currentItem = mShoppingList.get(position);
         holder.productName.setText(currentItem.getName());
 
@@ -96,25 +101,22 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
        // checkExpiry(currentItem.getBestByDate(), position,holder);//Send each date to check if its expired when page loads
     }
 
-
-
-
-
-
-
-
     public void removeItem(int position){
         //User spam tapping "delete" button causes Array out of bounds exception and crashes app. try/catch fixes it
         try {
             mShoppingList.remove(position);
             notifyItemRemoved(position);
             notifyItemChanged(position);
+
             save();
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("TAG", "Couldnt remove ingredient");
         }
     }
+
+
+
     private void save(){
         SharedPreferences sharedPreferences = mContext.getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -122,7 +124,6 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
         String json = gson.toJson(mShoppingList);
         editor.putString("shopping list", json);
         editor.apply();
-
     }
 
 @Override
