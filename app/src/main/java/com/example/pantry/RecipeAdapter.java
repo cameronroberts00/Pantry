@@ -55,6 +55,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
         public ImageView recipeImage;
 
 
+
         public ExampleViewHolder(View itemView){
             super(itemView);
             //todo declare textviews and container here
@@ -143,7 +144,7 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
                 Log.d("TAG", "clicked " + holder.getAdapterPosition() + " " + currentItem.getTitle() + " " + currentItem.getId());
                 getWebUrl(currentItem.getId());
                 //  openTip(position,holder,view);
-                //todo get url from id here then open it
+
             }
         });
 
@@ -167,7 +168,8 @@ recipeContainer=itemView.findViewById(R.id.recipe_container);
         for(int i=0;i<splitMissing.length;i++){
             getImage(splitMissing[i]);
         }
-        save();
+
+        save();//save the shopping list
     }
 
 

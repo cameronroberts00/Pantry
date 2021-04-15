@@ -65,6 +65,7 @@ public class Shopping extends Fragment {
         saveButton = view.findViewById(R.id.addButton);
         saveButton.setOnClickListener(listener);
         showSaveText=view.findViewById(R.id.saveText);
+        showSaveText.bringToFront();
         requiredText=view.findViewById(R.id.required);
         mQueue = Volley.newRequestQueue(getActivity());
         loadData();
@@ -108,7 +109,7 @@ public class Shopping extends Fragment {
             }
         }
     };
-
+boolean gotResponse=false;
     private void searchItem(){
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
@@ -117,6 +118,7 @@ public class Shopping extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            gotResponse=true;
                           //  loading.setVisibility(View.INVISIBLE);
                            // loaded = true;
                        //     content.setVisibility(View.VISIBLE);//hide content while its just empty
@@ -139,18 +141,29 @@ public class Shopping extends Fragment {
                             ex.printStackTrace();
 //image=" ";
                         }
+                    //    addItem(userInput, image);//these calls have to be duplicated as they cant go at the end because they need to only be called on a response
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {//This will be triggered by API not finding product
                 Log.d("TAG", "onErrorResponse: " + error);
               //  image=" ";
+               // addItem(userInput, image);
             }
         });
-        //TODO if owts wrong, reset image back to what it was - " "
+
         mQueue.add(request);//add the call to the volley queue
-        Log.d("TAG", "User input added as "+userInput+" "+image);
-        addItem(userInput, image);
+        new CountDownTimer(500,100){//This gives half a second for the response to come back so we arent waiting ages to get an image (i.e. no internet ). if image goes thru as null (i.e. internet is down), a little trolley image will appear instead. This isnt in the error func above as timeout error comes a lot later than .5s
+            public void onTick(long millisUntilFinished) {
+                //necessary method in countdown timer thats called each interval
+            }
+            @Override
+            public void onFinish() {
+                addItem(userInput,image);
+            }
+        }.start();
+        Log.d("TAG", "User input sent from seachItem() as "+userInput+" "+image);
+
     }
 
 private void getUrl(){
@@ -164,7 +177,8 @@ private void getUrl(){
     private void addItem(String name, String image){
        // image="";//image is gotten in the adapter class, just pass an empty image for now
         mShoppingList.add(new ShoppingListItem(name,image));
-        mAdapter.notifyItemInserted(mAdapter.getItemCount()+1);
+        Log.d("TAG", "Item actually inserted as "+mShoppingList.get(mAdapter.getItemCount()-1).getName()+mShoppingList.get(mAdapter.getItemCount()-1).getImage());
+        mAdapter.notifyItemInserted(mAdapter.getItemCount());
         save();//do save
     }
 
@@ -175,6 +189,7 @@ private void getUrl(){
         String json = gson.toJson(mShoppingList);
         editor.putString("shopping list", json);
         editor.apply();
+        image=null;
         showSave();//show save text
     }
 
@@ -195,6 +210,7 @@ private void getUrl(){
     }
 
     private void showSave(){
+
         showSaveText.setVisibility(View.VISIBLE);
         new CountDownTimer(1000,100){
             public void onTick(long millisUntilFinished) {
@@ -206,4 +222,6 @@ private void getUrl(){
             }
         }.start();
     }
+
+
 }

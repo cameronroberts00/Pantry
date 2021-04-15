@@ -143,10 +143,68 @@ public void getCategory( String categoryUppercased){
     Log.d("TAG", "Received category of: "+categoryUppercased);
         //This is a category sorter. when called in for loop it goes thru all product categories and finds most identifiable one. For example, If a product has: "Milk, Vegan, Dairy" as categories, obviously milk is the main identifiable one for a human.
         switch (categoryUppercased){
+            case "COOKED":
+                bestby=2;
+                getDate(bestby);
+                category=categoryUppercased;
+                break;
+            case "MEAT":
+            case "FISH":
+            case "RAW":
+                bestby=3;
+                getDate(bestby);
+                category=categoryUppercased;
+                break;
             case "MILK":
-                bestby=-7;
+            case "BREAD":
+            case "YOGHURT":
+            case "YOGURT":
+            case "FRUIT":
+                bestby=5;
                 getDate(bestby);
                 category=categoryUppercased;//swap categoryuppercased into category. For example, this puts value of "milk"  into category. Because saying categoryUppercased after switch will show the first category on the product, not the main identifying one which is milk. itd show "Vegan" etc. this is because we are going through a for loop, and 1st item might not be correct category
+                break;
+            case "VEGETABLE":
+                bestby=6;
+                getDate(bestby);
+                category=categoryUppercased;
+                break;
+            case "CHEESE":
+                bestby=10;
+                getDate(bestby);
+                category=categoryUppercased;
+                break;
+            case "JUICE":
+                bestby=30;
+                getDate(bestby);
+                category=categoryUppercased;
+                break;
+            case "CHOCOLATE":
+            case "SWEETS":
+            case "CANDY":
+            case "CONFECTIONERY":
+            case "JAM":
+                bestby=180;
+                getDate(bestby);
+                category=categoryUppercased;
+                break;
+            case "FROZEN":
+            case "ICE":
+            case "ICED":
+            case "TIN":
+            case "TINNED":
+            case "CAN":
+            case "CANNED":
+            case "PASTA":
+            case "GRAINS":
+            case "RICE":
+            case "FLOUR":
+            case "SUGAR":
+            case "HONEY":
+            case "CEREAL":
+                bestby=365;
+                getDate(bestby);
+                category=categoryUppercased;
                 break;
             default:
                 //dont put owt here as it is called for every category in the category array (the api provides many categories)
@@ -265,6 +323,7 @@ Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransacti
 
     private void cancelSelection(){//dont actually need to clear anything here as if it isnt saved, the next time the barcode sees something it will overwrite anyway. this is purely aesthetics for the user
        productInfo.setVisibility(View.INVISIBLE);
+       resetTexts();
         scanOnce=false;//allow scanning again
     }
 
@@ -287,9 +346,14 @@ Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransacti
         String json = gson.toJson(mIngredientList);
         editor.putString("ingredient list", json);
         editor.apply();
+        resetTexts();
         category=null;//TODO if categories start messing up, check this line here
     }
-
+private void resetTexts(){
+    barcodeText.setText("Loading...");
+    categoryText.setText("Category:");
+    bestByText.setText("Approx best-by:");
+}
 
 
     private void initialiseDetectorsAndSources() {

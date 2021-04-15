@@ -76,7 +76,7 @@
 
                         android:fontFamily="sans-serif-condensed"
                         android:padding="5dp"
-                        android:text="Barcode Text"
+                        android:text="Loading..."
                         android:textColor="@color/mainGreen"
                         android:textSize="25sp" />
 
@@ -92,7 +92,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:text="Approx best by: 5 days" />
+                        android:text="Approx best by:" />
                 </LinearLayout>
 
             </TableRow>

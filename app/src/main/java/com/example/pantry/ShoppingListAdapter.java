@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -36,6 +37,7 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
        // public TextView productBestByDate;
       //  public TextView expired;
         final public Button deleteButton;
+        public CardView parentCard;
        // final public Button savedItemButton;
        public Context mContext;
        public ExampleViewHolder(View itemView) {
@@ -43,6 +45,13 @@ public class ShoppingListAdapter  extends RecyclerView.Adapter<ShoppingListAdapt
            productPhoto=itemView.findViewById(R.id.productPhoto);
            productName=itemView.findViewById(R.id.product_name);
            deleteButton=itemView.findViewById(R.id.deleteButton);
+           parentCard=itemView.findViewById(R.id.parentCard);
+           parentCard.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   Log.d("TAG", "Clicked "+mShoppingList.get(getAdapterPosition()).getImage()+"\n"+mShoppingList.get(getAdapterPosition()).getName());
+               }
+           });
            deleteButton.setOnClickListener(listener);
        }
         View.OnClickListener listener = new View.OnClickListener() {
@@ -86,10 +95,13 @@ mHolder=holder;
         try{
 
         if(currentItem.getImage()!=null){//if we have an image for it, show it
+            holder.productPhoto.setImageDrawable(null);
             Glide.with(mContext).load(currentItem.getImage()).into(holder.productPhoto);
         }else{//if theres no image found for product, show locally sourced image (in case of no internet)
             Log.d("TAG", "No photo received for "+mShoppingList.get(position).getName()+", loading default");
-            holder.productPhoto.setBackgroundResource(R.drawable.can_background);
+            //holder.productPhoto.setBackgroundResource(R.drawable.can_background);
+            holder.productPhoto.setImageDrawable(null);//Not setting image to null before loading another can make photos blend together
+            Glide.with(mContext).load(R.mipmap.shopping_foreground).into(holder.productPhoto);
            // notifyItemInserted(position);
         }
         }
