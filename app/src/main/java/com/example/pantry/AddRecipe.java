@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -56,9 +57,14 @@ import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 
+//This class is made with help from TinyDB to store some data in shared preferences, find docs here:
+//https://tinydb.readthedocs.io/en/latest/
+
+//Barcode scanning in this class is made with help from:
+//https://medium.com/analytics-vidhya/creating-a-barcode-scanner-using-android-studio-71cff11800a2
+
 public class AddRecipe extends Fragment {
     View view;
-
     private SurfaceView surfaceView;
     private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
@@ -78,115 +84,97 @@ public class AddRecipe extends Fragment {
     private TextView categoryText;
     private String barcodeData;
     private String name;
-
     //These hold the product data individually
     private String category;
     private int bestby;//This is used to define how many days the product should last. that is then added to a custom Date
-
-
     private String bestByDate;//i turn date into string so i can save, it goes here.
-
-//JSONObject product;
-//JSONArray products;
-TinyDB tinyDB;
-
+    TinyDB tinyDB;
     private RequestQueue mQueue;
     String url;//This is the full url concatenated from the below
-    String urlStart="https://chompthis.com/api/v2/food/branded/barcode.php?api_key=";
-    String apiKey="Azq8PVSRvs3Ht2c12";
+    String urlStart = "https://chompthis.com/api/v2/food/branded/barcode.php?api_key=";
+    String apiKey = "Azq8PVSRvs3Ht2c12";
     String urlBarcode;// 9780140157376 <- example of barcode appearance
-    String urlEnd="&code=";
-
-    public boolean scanOnce=false;//just a lil bool to stop continous scanning
+    String urlEnd = "&code=";
+    public boolean scanOnce = false;//just a lil bool to stop continous scanning
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view= inflater.inflate(R.layout.fragment_add_recipe, container, false);//TODO put this in all fraggies
-        /*TODO
-        *  Make cancel button hide the product text. Make add product manually fragment. Work on the product detection and date setting.  */
-
-        //TODO Save products as java objects NOT json and save that to an ArrayList of products.
-        toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC,     100);
+        view = inflater.inflate(R.layout.fragment_add_recipe, container, false);
+        toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         surfaceView = view.findViewById(R.id.surface_view);
         barcodeText = view.findViewById(R.id.barcode_text);
-        tip=view.findViewById(R.id.tip);
-        errorText=view.findViewById(R.id.error);
-        categoryText=view.findViewById(R.id.category_text);
-        manualButton=view.findViewById(R.id.manual_button);
+        tip = view.findViewById(R.id.tip);
+        errorText = view.findViewById(R.id.error);
+        categoryText = view.findViewById(R.id.category_text);
+        manualButton = view.findViewById(R.id.manual_button);
         manualButton.setOnClickListener(buttonListener);
-        closeError=view.findViewById(R.id.closeError);
-        saveItem=view.findViewById(R.id.save);
-        cancelItem=view.findViewById(R.id.cancel);
-
+        closeError = view.findViewById(R.id.closeError);
+        saveItem = view.findViewById(R.id.save);
+        cancelItem = view.findViewById(R.id.cancel);
         productInfo = view.findViewById(R.id.product_table);
-    //    actionButtons=view.findViewById(R.id.action_buttons);
-        bestByText=view.findViewById(R.id.bestby_text);
-
+        //    actionButtons=view.findViewById(R.id.action_buttons);
+        bestByText = view.findViewById(R.id.bestby_text);
         mQueue = Volley.newRequestQueue(getActivity());
         //product=new JSONObject();
-       // products=new JSONArray();
-        tinyDB=new TinyDB(getContext());
-
+        // products=new JSONArray();
+        tinyDB = new TinyDB(getContext());
         productInfo.setVisibility(View.GONE);//hide, this will appear when product is actually found
         initialiseDetectorsAndSources();
-
-
         loadData();
 
-        Log.d("Warning", "This fragment will only work properly on a real life device or with an emulated camera");
+        Log.d("Warning!", "This fragment will only work properly on a real life device or with an emulated camera!");
         return view;
     }
 
-public void getCategory( String categoryUppercased){
-        //TODO add categories
-    Log.d("TAG", "Received category of: "+categoryUppercased);
+    public void getCategory(String categoryUppercased) {
+        Log.d("TAG", "Received category of: " + categoryUppercased);
         //This is a category sorter. when called in for loop it goes thru all product categories and finds most identifiable one. For example, If a product has: "Milk, Vegan, Dairy" as categories, obviously milk is the main identifiable one for a human.
-        switch (categoryUppercased){
+        switch (categoryUppercased) {
             case "COOKED":
-                bestby=2;
+                bestby = 2;
                 getDate(bestby);
-                category=categoryUppercased;
+                category = categoryUppercased;
                 break;
             case "MEAT":
             case "FISH":
             case "RAW":
-                bestby=3;
+                bestby = 3;
                 getDate(bestby);
-                category=categoryUppercased;
+                category = categoryUppercased;
                 break;
             case "MILK":
             case "BREAD":
             case "YOGHURT":
             case "YOGURT":
             case "FRUIT":
-                bestby=5;
+                bestby = 5;
                 getDate(bestby);
-                category=categoryUppercased;//swap categoryuppercased into category. For example, this puts value of "milk"  into category. Because saying categoryUppercased after switch will show the first category on the product, not the main identifying one which is milk. itd show "Vegan" etc. this is because we are going through a for loop, and 1st item might not be correct category
+                category = categoryUppercased;//swap categoryuppercased into category. For example, this puts value of "milk"  into category. Because saying categoryUppercased after switch will show the first category on the product, not the main identifying one which is milk. itd show "Vegan" etc. this is because we are going through a for loop, and 1st item might not be correct category
                 break;
             case "VEGETABLE":
-                bestby=6;
+                bestby = 6;
                 getDate(bestby);
-                category=categoryUppercased;
+                category = categoryUppercased;
                 break;
             case "CHEESE":
-                bestby=10;
+                bestby = 10;
                 getDate(bestby);
-                category=categoryUppercased;
+                category = categoryUppercased;
                 break;
             case "JUICE":
-                bestby=30;
+                bestby = 30;
                 getDate(bestby);
-                category=categoryUppercased;
+                category = categoryUppercased;
                 break;
             case "CHOCOLATE":
             case "SWEETS":
             case "CANDY":
             case "CONFECTIONERY":
             case "JAM":
-                bestby=180;
+                bestby = 180;
                 getDate(bestby);
-                category=categoryUppercased;
+                category = categoryUppercased;
                 break;
             case "FROZEN":
             case "ICE":
@@ -202,27 +190,27 @@ public void getCategory( String categoryUppercased){
             case "SUGAR":
             case "HONEY":
             case "CEREAL":
-                bestby=365;
+                bestby = 365;
                 getDate(bestby);
-                category=categoryUppercased;
+                category = categoryUppercased;
                 break;
             default:
                 //dont put owt here as it is called for every category in the category array (the api provides many categories)
                 break;
         }
+    }
 
-
-}
     //String bestByDate;
-private void getDate(int bestby){//Take the amount of days the product will last and add this to a date, then this gets turned to a string and stored with the other product info
-    Calendar calendar = Calendar.getInstance();//initiate calendar
-    calendar.add(Calendar.DAY_OF_YEAR,bestby);//adds how many days product lasts for onto the date
-    SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");//format UK style date
-    bestByDate=simpleDateFormat.format(calendar.getTime());//save this new date as a string as Date objects cant go into shared prefs
-    Log.d("TAG", "Date set as:"+bestByDate);
-}
+    private void getDate(int bestby) {//Take the amount of days the product will last and add this to a date, then this gets turned to a string and stored with the other product info
+        Calendar calendar = Calendar.getInstance();//initiate calendar
+        calendar.add(Calendar.DAY_OF_YEAR, bestby);//adds how many days product lasts for onto the date
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");//format UK style date
+        bestByDate = simpleDateFormat.format(calendar.getTime());//save this new date as a string as Date objects cant go into shared prefs
+        Log.d("TAG", "Date set as:" + bestByDate);
+    }
 
     ArrayList<IngredientItem> mIngredientList;
+
     private void jsonParse(String url) {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
@@ -232,33 +220,33 @@ private void getDate(int bestby){//Take the amount of days the product will last
                         try {
 
                             JSONArray jsonArray = response.getJSONArray("items");//get the items array from the returned object
-                            Log.d("barcode", "onResponse: Got reponse"+jsonArray.toString());//Show full reply in console
+                            Log.d("barcode", "onResponse: Got reponse" + jsonArray.toString());//Show full reply in console
                             JSONObject childObject = jsonArray.getJSONObject(0);//Go into the array, access the child which has the attributes - as this is a barcode search, we only need the first result, as this is the barcode's (normally only) match.
-                             name = childObject.getString("name");//Get name of the product out the child
-                           // barcodeText.setText(name);//Show name of scanned product
+                            name = childObject.getString("name");//Get name of the product out the child
+                            // barcodeText.setText(name);//Show name of scanned product
 
                             //Sort Categories of the returned product.
                             JSONArray categories = childObject.getJSONArray("keywords");//Get category array out the child
-                            for (int i=0; i<categories.length(); i++){//Go through each category
-                                String categoryUppercased= categories.getString(i).toUpperCase();//each string, make all lowercase to fit in the category sorter
+                            for (int i = 0; i < categories.length(); i++) {//Go through each category
+                                String categoryUppercased = categories.getString(i).toUpperCase();//each string, make all lowercase to fit in the category sorter
                                 getCategory(categoryUppercased);//send each category to category sorter
                                 getDate(bestby);//send the custom bestby date of the the date calculator calendar function
                             }
-                            if(category==null){//If the product doesnt match any of the categories ive predefined in order to set a custom best-by date, set it to the first category defined by the API
-                                category=categories.getString(0).toUpperCase();
-                                bestby=5;//Set a relatively "safe" best by as this product could be anything, fish or other expire quick products etc.
+                            if (category == null) {//If the product doesnt match any of the categories ive predefined in order to set a custom best-by date, set it to the first category defined by the API
+                                category = categories.getString(0).toUpperCase();
+                                bestby = 5;//Set a relatively "safe" best by as this product could be anything, fish or other expire quick products etc.
                                 getDate(bestby);
                             }
 
                             barcodeText.setText(name);
                             categoryText.setText(category);
-                            bestByText.setText(String.valueOf("Best in: "+bestby+" days"));
+                            bestByText.setText(String.valueOf("Best in: " + bestby + " days"));
 
                             saveItem.setOnClickListener(buttonListener);//listen for the cancel and the save buttons which are used to add/try again with the product
                             cancelItem.setOnClickListener(buttonListener);
                         } catch (JSONException ex) {//for some reason, the try failed.
                             ex.printStackTrace();
-                            barcodeText.setText("Error. The following happened: "+ex);
+                            barcodeText.setText("Error. The following happened: " + ex);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -270,8 +258,9 @@ private void getDate(int bestby){//Take the amount of days the product will last
         mQueue.add(request);//add the call to the volley queue
         productInfo.setVisibility(view.VISIBLE);//show the popup with info
     }
-    private void showError(VolleyError error){//Hide product displays, tell user to just enter product manually
-        Log.d("Error","Name:"+error);
+
+    private void showError(VolleyError error) {//Hide product displays, tell user to just enter product manually
+        Log.d("Error", "Name:" + error);
         productInfo.setVisibility(View.INVISIBLE);
         errorText.setVisibility(View.VISIBLE);
         closeError.setVisibility(View.VISIBLE);
@@ -279,7 +268,7 @@ private void getDate(int bestby){//Take the amount of days the product will last
         closeError.setOnClickListener(buttonListener);//Listen for user to close the error
     }
 
-    private void hideError(){
+    private void hideError() {
         errorText.setVisibility(View.INVISIBLE);
         closeError.setVisibility(View.INVISIBLE);
     }
@@ -287,13 +276,13 @@ private void getDate(int bestby){//Take the amount of days the product will last
     final View.OnClickListener buttonListener = new View.OnClickListener() {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public void onClick(final View view) {
-            switch(view.getId()) {
+            switch (view.getId()) {
                 case R.id.save:
-                    insertItem(name, category,bestByDate);//save attributes
+                    insertItem(name, category, bestByDate);//save attributes
                     cancelSelection();
                     break;
                 case R.id.cancel:
-                   cancelSelection();
+                    cancelSelection();
                     break;
                 case R.id.closeError:
                     cancelSelection();
@@ -306,32 +295,34 @@ private void getDate(int bestby){//Take the amount of days the product will last
         }
     };
 
-@RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public void addManually(){//launches the add manually fragment
-    //TODO start manually adding fraggy
-    Log.d("TAG", "snosig");
-AddManually addManually = new AddManually();
-Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame,addManually).addToBackStack(null).commit();
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void addManually() {//launches the add manually fragment
+        //TODO start manually adding fraggy
+        Log.d("TAG", "snosig");
+        AddManually addManually = new AddManually();
+        Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame, addManually).addToBackStack(null).commit();
 
-}
-   // private IngredientAdapter mAdapter;
-    private void insertItem(String name, String category, String bestByDate){
-        mIngredientList.add(new IngredientItem(name, category,bestByDate));
+    }
+
+    // private IngredientAdapter mAdapter;
+    private void insertItem(String name, String category, String bestByDate) {
+        mIngredientList.add(new IngredientItem(name, category, bestByDate));
         //mAdapter.notifyItemInserted(mIngredientList.size());
         saveData();
     }
 
-    private void cancelSelection(){//dont actually need to clear anything here as if it isnt saved, the next time the barcode sees something it will overwrite anyway. this is purely aesthetics for the user
-       productInfo.setVisibility(View.INVISIBLE);
-       resetTexts();
-        scanOnce=false;//allow scanning again
+    private void cancelSelection() {//dont actually need to clear anything here as if it isnt saved, the next time the barcode sees something it will overwrite anyway. this is purely aesthetics for the user
+        productInfo.setVisibility(View.INVISIBLE);
+        resetTexts();
+        scanOnce = false;//allow scanning again
     }
 
     private void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("ingredient list", null);
-        Type type = new TypeToken<ArrayList<IngredientItem>>() {}.getType();
+        Type type = new TypeToken<ArrayList<IngredientItem>>() {
+        }.getType();
         mIngredientList = gson.fromJson(json, type);
         if (mIngredientList == null) {
             mIngredientList = new ArrayList<>();
@@ -347,28 +338,24 @@ Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransacti
         editor.putString("ingredient list", json);
         editor.apply();
         resetTexts();
-        category=null;//TODO if categories start messing up, check this line here
+        category = null;//TODO if categories start messing up, check this line here
     }
-private void resetTexts(){
-    barcodeText.setText("Loading...");
-    categoryText.setText("Category:");
-    bestByText.setText("Approx best-by:");
-}
+
+    private void resetTexts() {
+        barcodeText.setText("Loading...");
+        categoryText.setText("Category:");
+        bestByText.setText("Approx best-by:");
+    }
 
 
     private void initialiseDetectorsAndSources() {
-
-        //Toast.makeText(getApplicationContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
-
         barcodeDetector = new BarcodeDetector.Builder(getActivity())
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
-
         cameraSource = new CameraSource.Builder(getActivity(), barcodeDetector)
                 .setRequestedPreviewSize(1920, 1080)
                 .setAutoFocusEnabled(true)
                 .build();
-
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
@@ -379,7 +366,6 @@ private void resetTexts(){
                         ActivityCompat.requestPermissions(getActivity(), new
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -394,13 +380,10 @@ private void resetTexts(){
                 cameraSource.stop();
             }
         });
-
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-                // Toast.makeText(getApplicationContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
             }
-
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
@@ -408,16 +391,16 @@ private void resetTexts(){
                     barcodeText.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (!scanOnce) {//remove this and other commented out
+                            if (!scanOnce) {
                                 if (barcodes.valueAt(0).email != null) {
                                     barcodeText.removeCallbacks(null);
                                     barcodeData = barcodes.valueAt(0).email.address;
-                                   // barcodeText.setText(barcodeData);
+                                    // barcodeText.setText(barcodeData);
                                     Log.d("barcode", "run: " + barcodeData);
                                     toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
                                 } else {
                                     barcodeData = barcodes.valueAt(0).displayValue;
-                                 //   barcodeText.setText(barcodeData);
+                                    //   barcodeText.setText(barcodeData);
                                     Log.d("barcode", "run: " + barcodeData);
                                     toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
                                 }
@@ -426,15 +409,12 @@ private void resetTexts(){
                                 Log.d("barcode", "Barcode registered as " + urlBarcode);
                                 url = urlStart + apiKey + urlEnd + urlBarcode;
                                 jsonParse(url);
-
-                            }//hi remove us too to get rid of the scan once feature
-                            scanOnce=true;//me 3 :)
+                            }
+                            scanOnce = true;
                         }
                     });
-
                 }
             }
         });
     }
-
 }

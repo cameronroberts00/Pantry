@@ -22,40 +22,34 @@ import java.util.Objects;
 
 
 public class OpenedTip extends Fragment {
-View view;
-TextView nameText;
-TextView bodyText;
-ImageView imageView;
-Button back;
+    View view;
+    TextView nameText;
+    TextView bodyText;
+    ImageView imageView;
+    Button back;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view=inflater.inflate(R.layout.fragment_opened_tip, container, false);
-        nameText=view.findViewById(R.id.name_text);
-        bodyText=view.findViewById(R.id.body_text);
-        imageView=view.findViewById(R.id.image_view);
-        back=view.findViewById(R.id.back);
-
+        view = inflater.inflate(R.layout.fragment_opened_tip, container, false);
+        nameText = view.findViewById(R.id.name_text);
+        bodyText = view.findViewById(R.id.body_text);
+        imageView = view.findViewById(R.id.image_view);
+        back = view.findViewById(R.id.back);
         back.setOnClickListener(listener);
-
+        //This bundle is 'unpacking' the content sent from the homepage when the user clicked the item
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            String defaultValue="";
+            String defaultValue = "";
             String name = bundle.getString("name", defaultValue);
             String body = bundle.getString("body", defaultValue);
-            String image = bundle.getString("image",defaultValue);
+            String image = bundle.getString("image", defaultValue);
 
             nameText.setText(name);
             bodyText.setText(body);
             Glide.with(getContext()).load(image).into(imageView);
-            Log.d("TAG", "Attributes loaded are"+name+body+image);
+            Log.d("TAG", "Attributes loaded are" + name + body + image);
         }
-
-        //Glide.with(getActivity()).load("https://upload.wikimedia.org/wikipedia/commons/a/a4/Anatomy_of_a_Sunset-2.jpg").into(imageView);
-
-
-
         return view;
     }
 
@@ -63,10 +57,10 @@ Button back;
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onClick(View view) {
-            switch(view.getId()){
+            switch (view.getId()) {
                 case R.id.back:
                     Home home = new Home();
-                    Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame,home).addToBackStack(null).commit();
+                    Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame, home).addToBackStack(null).commit();
                     break;
 
             }

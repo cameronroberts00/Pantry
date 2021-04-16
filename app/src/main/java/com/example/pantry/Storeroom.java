@@ -37,12 +37,10 @@ public class Storeroom extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_storeroom, container, false);
-        emptyContainer=view.findViewById(R.id.emptyContainer);
-
-
+        emptyContainer = view.findViewById(R.id.emptyContainer);
         loadData();
         buildRecyclerView();
-       // setInsertButton();
+        // setInsertButton();
        /* Button buttonSave = view.findViewById(R.id.button_save);
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,9 +52,6 @@ public class Storeroom extends Fragment {
     }
 
 
-
-
-
     void saveData() {//To add recipe
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -65,41 +60,39 @@ public class Storeroom extends Fragment {
         editor.putString("ingredient list", json);
         editor.apply();
     }
+
     private void loadData() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("ingredient list", null);
-        Type type = new TypeToken<ArrayList<IngredientItem>>() {}.getType();
+        Type type = new TypeToken<ArrayList<IngredientItem>>() {
+        }.getType();
         mIngredientList = gson.fromJson(json, type);
         if (mIngredientList == null) {
             mIngredientList = new ArrayList<>();
         }
-       isEmpty();//check to see if storeroom is empty on open, if sso, give them a hint to add items
+        isEmpty();//check to see if storeroom is empty on open, if sso, give them a hint to add items
     }
 
-    private void isEmpty(){
-        if (mIngredientList.size()<=0) {
+    private void isEmpty() {
+        if (mIngredientList.size() <= 0) {
 
             Log.d("TAG", "Nowt here");
             //TODO load graphic that shows its empty
             emptyContainer.setVisibility(View.VISIBLE);
         }
     }
+
     private void buildRecyclerView() {
         mRecyclerView = view.findViewById(R.id.recyclerview);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());
-        mAdapter = new IngredientAdapter(mIngredientList,getActivity());
+        mAdapter = new IngredientAdapter(mIngredientList, getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
-    //    testy();
+        //    testy();
     }
 
-  //  private void testy(){
-   //     Log.d("TAG", "testy: "+mRecyclerView.getLayoutManager().findViewByPosition(0));
-   // }
-
-    //thid added
     /*private void setInsertButton() {
        Button buttonInsert = view.findViewById(R.id.button_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {

@@ -21,30 +21,30 @@ import com.google.android.material.navigation.NavigationView;
 
 //This class has navigation components and frag loading
 public class MainActivity extends AppCompatActivity {
-//private;
-FrameLayout frameLayout;
-FrameLayout progressLayout;
+    //private;
+    FrameLayout frameLayout;
+    FrameLayout progressLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        frameLayout = (FrameLayout)findViewById(R.id.frame);
-        progressLayout=(FrameLayout)findViewById(R.id.progressFrame);
+        frameLayout = (FrameLayout) findViewById(R.id.frame);
+        progressLayout = (FrameLayout) findViewById(R.id.progressFrame);
         loadFrag(new Home());//load home frag
         loadProgress(new ProgressBar());//Load progressbar into top frame
 
-     //   getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //   getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        final BottomNavigationView btmn=(BottomNavigationView)findViewById(R.id.bottomNavigationView);
+        final BottomNavigationView btmn = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
         btmn.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.home:
-                    loadFrag(new Home());
-                    break;
+                        loadFrag(new Home());
+                        break;
                     case R.id.shopping:
                         loadFrag(new Shopping());
                         break;
@@ -54,14 +54,14 @@ FrameLayout progressLayout;
                     case R.id.storeroom:
                         loadFrag(new Storeroom());
                         break;
-                   // default:
-                      //  throw new IllegalStateException("Unexpected value: " + item.getItemId());
+                    // default:
+                    //  throw new IllegalStateException("Unexpected value: " + item.getItemId());
                 }
                 return true;
             }
         });
         //Check if the AddRecipe fab has been selected (it isnt in the btmn nav)
-        FloatingActionButton floatingActionButton=(FloatingActionButton)findViewById(R.id.fab);
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,21 +72,19 @@ FrameLayout progressLayout;
 
     }
 
-
-    private void loadFrag(Fragment fragment){//take fragment input and load appropriate classs associated with it
+    private void loadFrag(Fragment fragment) {//take fragment input and load appropriate classs associated with it
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame,fragment);//replace frameview with content from fragment
-        //how to send bundles
+        transaction.replace(R.id.frame, fragment);//replace frameview with content from fragment
+        //send bundle in fragment
         // Bundle bundle = new Bundle();//start new bundle to send
-        //String value="www.websitel/link.com";//value that is sent
+        //String value="";//value that is sent
         // String key="2";//how we identify the value
         // bundle.putString(key, value);//put in envelope.
         // fragment.setArguments(bundle);//ka-ciao, off they go
-
         transaction.commit();//do it, equiv of start intent
     }
 
-    private void loadProgress(Fragment fragment){
+    private void loadProgress(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.progressFrame, fragment);
         transaction.commit();

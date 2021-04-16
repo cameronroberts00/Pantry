@@ -9,21 +9,23 @@ public class TipBlogItem {
     public TipBlogItem(String name, String category, String body, String imageUrl) {
         mName = name;
         mCategory = category;
-        mBody=body;
-        mImageUrl=imageUrl;
+        mBody = body;
+        mImageUrl = imageUrl;
     }
+
     public String getName() {
         return mName;
     }
+
     public String getCategory() {
         return mCategory;
     }
-    public String getBody(){
+
+    public String getBody() {
         return mBody;
     }
-    public String getImageUrl(){
-        return  mImageUrl;
+
+    public String getImageUrl() {
+        return mImageUrl;
     }
-
-
 }

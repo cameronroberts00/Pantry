@@ -48,107 +48,105 @@ public class Home extends Fragment {
     ImageView image;
     View view;
     private RequestQueue mQueue;
-    String url="https://pantry-be356-default-rtdb.europe-west1.firebasedatabase.app/.json";//Firebase database for tips
+    String url = "https://pantry-be356-default-rtdb.europe-west1.firebasedatabase.app/.json";//Firebase database for tips
 
     //These are filled with json from firebase database
     String name;//tip name
     String imageUrl;//tip image
     String body;//tip body
-    ArrayList<TipBlogItem> mTipList,mTipList2;
-    //int count=0;//used to count the tips and telll the adapter how many tips to display
+    ArrayList<TipBlogItem> mTipList, mTipList2;
     String category;//category of the tip (for sorting)
 
     //These are used to hold featured tip info
     String mFeaturedName;
     String mFeaturedBody;
     String mFeaturedUrl;
-    int random;//this is 0 by default but set between 0 and jsonaray length to determine featured tip.
+
+    int random;//this is 0 by default but set between 0 and jsonaray length to determine featured tip. A random number is selected once per day, this is then used to select tip to feature.
     private TextView featuredName;
-
-    private RecyclerView mRecyclerView,mRecyclerView2;
-    private TipAdapter mAdapter,mAdapter2;
+    private RecyclerView mRecyclerView, mRecyclerView2;
+    private TipAdapter mAdapter, mAdapter2;
     private RecyclerView.LayoutManager mLayoutManager, mLayoutManager2;
-
     private ImageView featuredImage;
     private CardView featured;
     private ScrollView content;
     private ConstraintLayout loading;
     private ConstraintLayout timeout;
     private Button refresh;
-    private boolean loaded=false;//this sets to true once jsonarray with content comes thru. if it hasnt set to true in 10 seconds, tell user to check internet/reload etc.
+    private boolean loaded = false;//this sets to true once jsonarray with content comes thru. if it hasnt set to true in 10 seconds, tell user to check internet/reload etc.
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_home, container, false);
         /*Trigger the updateProgress function in the progress bar (Add a point)*/
-       FragmentManager fm = getFragmentManager();
+     /*  FragmentManager fm = getFragmentManager();
         ProgressBar frag = (ProgressBar) fm.findFragmentById(R.id.progressFrame);
         if (frag != null) {
             frag.updateProgress();
-        }
-
+        }*/
 
         buildRecycler1();
         buildRecycler2();
-        featuredImage=view.findViewById(R.id.featured_image);
-        featured=view.findViewById(R.id.featured_holder);
-        loading=view.findViewById(R.id.loading);
-        timeout=view.findViewById(R.id.timeout);
-        content=view.findViewById(R.id.content);
+        featuredImage = view.findViewById(R.id.featured_image);
+        featured = view.findViewById(R.id.featured_holder);
+        loading = view.findViewById(R.id.loading);
+        timeout = view.findViewById(R.id.timeout);
+        content = view.findViewById(R.id.content);
         content.setVisibility(View.INVISIBLE);
         timeout.setVisibility(View.INVISIBLE);
-        refresh=view.findViewById(R.id.refresh);
+        refresh = view.findViewById(R.id.refresh);
         refresh.setOnClickListener(listener);
-        featuredName=view.findViewById(R.id.featured_name);
-
+        featuredName = view.findViewById(R.id.featured_name);
         mQueue = Volley.newRequestQueue(getActivity());
+
         checkTimeout();
         loadContent();
 
-
-
         return view;
     }
-    private void checkTimeout(){
+
+    private void checkTimeout() {
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-             if(loaded==false){
-                 //if content hasnt loading in 10 seconds, tell user to refresh
-                 Log.d("TAG", "Hasn't loaded in 10 seconds, offer refresh.");
-                 loading.setVisibility(View.INVISIBLE);
-                 timeout.setVisibility(View.VISIBLE);
-             }
+                if (loaded == false) {
+                    //if content hasnt loading in 10 seconds, tell user to refresh
+                    Log.d("TAG", "Hasn't loaded in 10 seconds, offer refresh.");
+                    loading.setVisibility(View.INVISIBLE);
+                    timeout.setVisibility(View.VISIBLE);
+                }
             }
         }, 10000);
     }
-    private void buildRecycler1(){//build the first recycler
+
+    private void buildRecycler1() {//build the first recycler
         if (mTipList == null) {
             mTipList = new ArrayList<>();
         }
-            mRecyclerView = view.findViewById(R.id.recyclerview);
-            mRecyclerView.setHasFixedSize(true);
-            mLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-            mAdapter = new TipAdapter(mTipList,getContext());
-            mRecyclerView.setLayoutManager(mLayoutManager);
-            mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView = view.findViewById(R.id.recyclerview);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mAdapter = new TipAdapter(mTipList, getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
     }
-    private void buildRecycler2(){//initialise and build the second recycler
+
+    private void buildRecycler2() {//initialise and build the second recycler
         if (mTipList2 == null) {
             mTipList2 = new ArrayList<>();
         }
         mRecyclerView2 = view.findViewById(R.id.recyclerview2);
         mRecyclerView2.setHasFixedSize(true);
-        mLayoutManager2 = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-        mAdapter2 = new TipAdapter(mTipList2,getContext());
+        mLayoutManager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mAdapter2 = new TipAdapter(mTipList2, getContext());
         mRecyclerView2.setLayoutManager(mLayoutManager2);
         mRecyclerView2.setAdapter(mAdapter2);
     }
 
-   private void loadContent(){
-       try {
+    private void loadContent() {
+        try {
             loading.setVisibility(View.VISIBLE);
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                     new Response.Listener<JSONObject>() {
@@ -179,10 +177,10 @@ public class Home extends Fragment {
                                         //random=//from saved prefs;
                                         Log.d("TAG", "Function already called today, getting random feature from storage " + random);
                                     }
-                                }catch(Exception e){
-                                    Log.d("TAG", "Failed in date function! "+e);
+                                } catch (Exception e) {
+                                    Log.d("TAG", "Failed in date function! " + e);
 
-                                    }
+                                }
                                 featureRandom(jsonArray, random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
 
                                 //this for loop iterates the array and accesses all the attributes of each individual item
@@ -200,8 +198,6 @@ public class Home extends Fragment {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-
-
                                 }
                             } catch (JSONException ex) {//for some reason, the try failed.
                                 ex.printStackTrace();
@@ -215,93 +211,89 @@ public class Home extends Fragment {
                 }
             });
             mQueue.add(request);//add the call to the volley queue
-        }catch (Exception e){
-            Log.d("TAG", "Failed to get content in home!\n"+e);
+        } catch (Exception e) {
+            Log.d("TAG", "Failed to get content in home!\n" + e);
         }
-       }
+    }
 
 
-       @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-       public void featureRandom(JSONArray jsonArray, int random){
-           try {
-               if(random==0) {
-                   Log.d("TAG", "Random feature wasnt initialised, getting random number and saving it "+random);
-                   //if random isnt initaliased, then this was called from the function that runs once per day, get a random number and save it.
-                   random = (int) ((Math.random() * ((jsonArray.length()))));//get random number in array's length
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void featureRandom(JSONArray jsonArray, int random) {
+        try {
+            if (random == 0) {
+                Log.d("TAG", "Random feature wasnt initialised, getting random number and saving it " + random);
+                //if random isnt initaliased, then this was called from the function that runs once per day, get a random number and save it.
+                random = (int) ((Math.random() * ((jsonArray.length()))));//get random number in array's length
 
-                   SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
-                   SharedPreferences.Editor editor = randomStorer.edit();
-                   editor.putInt("random",random);
-                   editor.commit();
+                SharedPreferences randomStorer = getContext().getSharedPreferences("random", 0);
+                SharedPreferences.Editor editor = randomStorer.edit();
+                editor.putInt("random", random);
+                editor.commit();
+            }
+            Log.d("TAG", "String caught for removal" + jsonArray.getString(random));
 
-               }
-               Log.d("TAG", "String caught for removal" + jsonArray.getString(random));
+            //take the entries attributes and store them in seperate fields
+            JSONObject childObject = jsonArray.getJSONObject(random);
+            mFeaturedName = childObject.getString("name");
+            mFeaturedBody = childObject.getString("body");
+            mFeaturedUrl = childObject.getString("image");
+            featuredName.setText(mFeaturedName);
+            Glide.with(getActivity()).load(mFeaturedUrl).into(featuredImage);
+            Log.d("TAG", "Featured tip is: " + mFeaturedName + mFeaturedBody);
+            featured.setOnClickListener(listener);
 
-               //take the entries attributes and store them in seperate fields
-                   JSONObject childObject = jsonArray.getJSONObject(random);
-                   mFeaturedName = childObject.getString("name");
-                   mFeaturedBody = childObject.getString("body");
-                   mFeaturedUrl = childObject.getString("image");
+            //remove the item thats going into the featured tip holder to stop it appearing with the others as well
+            jsonArray.remove(random);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("TAG", "In catch on featureRandom");
+        }
+    }
 
-                   featuredName.setText(mFeaturedName);
-               Glide.with(getActivity()).load(mFeaturedUrl).into(featuredImage);
-               Log.d("TAG", "Featured tip is: " + mFeaturedName+mFeaturedBody);
+    View.OnClickListener listener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.featured_holder:
+                    Log.d("TAG", "Tapped featured holder\n" + mFeaturedName);
 
-               featured.setOnClickListener(listener);
+                    Fragment openedTip = new OpenedTip();
+                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("name", mFeaturedName);
+                    bundle.putString("body", mFeaturedBody);
+                    bundle.putString("image", mFeaturedUrl);
 
-
-               //remove the item thats going into the featured tip holder to stop it appearing with the others as well
-               jsonArray.remove(random);
-           }catch (Exception e){
-               e.printStackTrace();
-               Log.d("TAG", "In catch on featureRandom");
-           }
-       }
-
-       View.OnClickListener listener = new View.OnClickListener() {
-           @Override
-           public void onClick(View view) {
-               switch(view.getId()){
-                   case R.id.featured_holder:
-                       Log.d("TAG", "Tapped featured holder\n"+mFeaturedName);
-
-                       Fragment openedTip = new OpenedTip();
-                       AppCompatActivity activity = (AppCompatActivity) view.getContext();
-                       Bundle bundle = new Bundle();
-                       bundle.putString("name", mFeaturedName);
-                       bundle.putString("body", mFeaturedBody);
-                       bundle.putString("image",mFeaturedUrl);
-
-                       openedTip.setArguments(bundle);
+                    openedTip.setArguments(bundle);
 
 
-                       activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame, openedTip).addToBackStack(null).commit();
-                       //todo deal with featured holder taps
-                       //todo add items to bundle, send this with new fragment instannce of openedtip.java
-                       break;
-                   case R.id.refresh://user timed out, this reloads frag
-                       Fragment home = new Home();
-                       AppCompatActivity reload = (AppCompatActivity) view.getContext();
-                       reload.getSupportFragmentManager().beginTransaction().replace(R.id.frame, home).addToBackStack(null).commit();
-                       break;
-               }
-           }
-       };
+                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame, openedTip).addToBackStack(null).commit();
+                    //todo deal with featured holder taps
+                    //todo add items to bundle, send this with new fragment instannce of openedtip.java
+                    break;
+                case R.id.refresh://user timed out, this reloads frag
+                    Fragment home = new Home();
+                    AppCompatActivity reload = (AppCompatActivity) view.getContext();
+                    reload.getSupportFragmentManager().beginTransaction().replace(R.id.frame, home).addToBackStack(null).commit();
+                    break;
+            }
+        }
+    };
 
-       public void sortCategories(String category){
-        if(category.equals("waste")){//If first category, chuck it in the first recycler
-         //   Log.d("TAG", "Category 1 "+category);
-            mTipList.add(new TipBlogItem(name, category,body,imageUrl));
+    public void sortCategories(String category) {
+        if (category.equals("waste")) {//If first category, chuck it in the first recycler
+            //   Log.d("TAG", "Category 1 "+category);
+            mTipList.add(new TipBlogItem(name, category, body, imageUrl));
             buildRecycler1();//Add item and send to recycler
-        }else if(category.equals("tip")){
-            mTipList2.add(new TipBlogItem(name, category,body,imageUrl));
-          //  mTipList2.add(new TipBlogItem(name, category,body,imageUrl));
+        } else if (category.equals("tip")) {
+            mTipList2.add(new TipBlogItem(name, category, body, imageUrl));
+            //  mTipList2.add(new TipBlogItem(name, category,body,imageUrl));
             buildRecycler2();//Add item and send to recycler
-        //    Log.d("TAG", "Category 2 "+category);
-        }else{
-            Log.d("TAG", "Entry with obscure category: "+name+category);
+            //    Log.d("TAG", "Category 2 "+category);
+        } else {
+            Log.d("TAG", "Entry with obscure category: " + name + category);
         }
-       }
+    }
 
     @Override
     public void onPause() {
@@ -311,8 +303,8 @@ public class Home extends Fragment {
         This solves it.
          */
         super.onPause();
-        mTipList2=null;
-        mTipList=null;
+        mTipList2 = null;
+        mTipList = null;
         Log.d("TAG", "onPause: ArrayLists set to null");
     }
 }
@@ -401,7 +393,6 @@ String again = newDateFormat.format(freshCalendar.getTime());
 // Log.d("TAG", "Calendar "+bestbyDate);
 
 /*End of add a point*/
-
 
 
 //Food goes out of date today.

@@ -9,16 +9,31 @@ public class RecipeItem {
     private ArrayList<String> mMissing;
     private ArrayList<String> mUsing;
 
-    public RecipeItem(String id, String title, String image, ArrayList<String> missing, ArrayList<String> using){
+    public RecipeItem(String id, String title, String image, ArrayList<String> missing, ArrayList<String> using) {
         mId = id;
         mTitle = title;
         mImage = image;
         mMissing = missing;
-        mUsing =using;
+        mUsing = using;
     }
-    public String getId(){return mId;}
-    public String getTitle(){return mTitle;}
-    public String getImage(){return mImage;}
-    public ArrayList<String> getMissing(){return mMissing;}
-    public ArrayList<String> getUsing(){return mUsing;}
+
+    public String getId() {
+        return mId;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public String getImage() {
+        return mImage;
+    }
+
+    public ArrayList<String> getMissing() {
+        return mMissing;
+    }
+
+    public ArrayList<String> getUsing() {
+        return mUsing;
+    }
 }

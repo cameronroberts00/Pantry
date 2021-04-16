@@ -34,42 +34,46 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.content.Context.MODE_PRIVATE;
+
 //In this class:
 //this converts the arraylist from storage into a recyclerview format
 //There is also date checking at the bottom
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.ExampleViewHolder> {
     public ArrayList<IngredientItem> mIngredientList;
+
     public class ExampleViewHolder extends RecyclerView.ViewHolder {
         public TextView productName;
-        public TextView  productCategory;
+        public TextView productCategory;
         public TextView productBestByDate;
         public TextView expired;
         final public Button deleteButton;
         final public Button savedItemButton;
+
         public ExampleViewHolder(View itemView) {
             super(itemView);
             productName = itemView.findViewById(R.id.product_name);
             productCategory = itemView.findViewById(R.id.product_category);
-            productBestByDate=itemView.findViewById(R.id.product_bestby);
-            expired=itemView.findViewById(R.id.expired);
+            productBestByDate = itemView.findViewById(R.id.product_bestby);
+            expired = itemView.findViewById(R.id.expired);
             deleteButton = itemView.findViewById(R.id.deleteButton);
-            savedItemButton=itemView.findViewById(R.id.savedButton);
+            savedItemButton = itemView.findViewById(R.id.savedButton);
             deleteButton.setOnClickListener(listener);
             savedItemButton.setOnClickListener(listener);
 
         }
+
         View.OnClickListener listener = new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View view) {
-                switch(view.getId()){
+                switch (view.getId()) {
                     case R.id.deleteButton://user timed out, this reloads frag
                         //called if user binned an item
                         removeIngredient(getAdapterPosition());
                         break;
                     case R.id.savedButton:
                         //Called if user saved an item
-                        FragmentManager fm = ((AppCompatActivity)mContext).getSupportFragmentManager();
+                        FragmentManager fm = ((AppCompatActivity) mContext).getSupportFragmentManager();
                         ProgressBar frag = (ProgressBar) fm.findFragmentById(R.id.progressFrame);
                         if (frag != null) {
                             frag.updateProgress();
@@ -77,34 +81,33 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
                         removeIngredient(getAdapterPosition());
                         break;
                 }
-                if(mIngredientList.size()==0){//if user has just deleted the last item, refresh the storeroom to show the "no items screen"
+                if (mIngredientList.size() == 0) {//if user has just deleted the last item, refresh the storeroom to show the "no items screen"
                     Storeroom storeroom = new Storeroom();
-                    ((AppCompatActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.frame,storeroom).addToBackStack(null).commit();
+                    ((AppCompatActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.frame, storeroom).addToBackStack(null).commit();
                 }
             }
         };
     }
-@RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public void removeIngredient(int position){
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void removeIngredient(int position) {
         //User spam tapping "delete" button causes Array out of bounds exception and crashes app. try/catch fixes it
-            try {
-                mIngredientList.remove(position);
+        try {
+            mIngredientList.remove(position);
 
-                notifyItemRemoved(position);
-                notifyItemChanged(position);
+            notifyItemRemoved(position);
+            notifyItemChanged(position);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.d("TAG", "caught in removeIngredient func");
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("TAG", "caught in removeIngredient func");
+        }
+    }
 
+    public Context mContext;
 
-}
-
-public Context mContext;
-
-    public IngredientAdapter(ArrayList<IngredientItem> ingredientList,Context context) {
-        mContext=context;
+    public IngredientAdapter(ArrayList<IngredientItem> ingredientList, Context context) {
+        mContext = context;
         mIngredientList = ingredientList;
     }
 
@@ -118,12 +121,12 @@ public Context mContext;
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(ExampleViewHolder holder, int position) {
-       IngredientItem currentItem = mIngredientList.get(position);
+        IngredientItem currentItem = mIngredientList.get(position);
         holder.productName.setText(currentItem.getName());
         holder.productCategory.setText(currentItem.getCategory());
         holder.productBestByDate.setText(currentItem.getBestByDate());
         holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
-        checkExpiry(currentItem.getBestByDate(), position,holder);//Send each date to check if its expired when page loads
+        checkExpiry(currentItem.getBestByDate(), position, holder);//Send each date to check if its expired when page loads
     }
 
     @Override
@@ -133,52 +136,46 @@ public Context mContext;
 
     //TODO signal more intricate date warning systems here. Different colours for different levels of gone off-ness.
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void checkExpiry(String mBestbyDate, int position, ExampleViewHolder holder){//Get the best by date and positions from each item, also pass holder so later on in expiredItem() we can call it to access textview
-        Log.d("TAG", "Best by date in IngredientAdapter is: "+mBestbyDate);
+    public void checkExpiry(String mBestbyDate, int position, ExampleViewHolder holder) {//Get the best by date and positions from each item, also pass holder so later on in expiredItem() we can call it to access textview
+        Log.d("TAG", "Best by date in IngredientAdapter is: " + mBestbyDate);
 
         //Create a fresh calendar with today's date on it to compare to the best by
-        Calendar freshCalendar= Calendar.getInstance();//make new calendar and set its date to now
-        SimpleDateFormat newDateFormat= new SimpleDateFormat("dd-MM-yyyy");
+        Calendar freshCalendar = Calendar.getInstance();//make new calendar and set its date to now
+        SimpleDateFormat newDateFormat = new SimpleDateFormat("dd-MM-yyyy");
         String thisDate = newDateFormat.format(freshCalendar.getTime());//turn it into string so it can be converted from SimpleDateFormat to a Date
         try {//This try takes both date strings and converts them into Dates so they can be checked against each other
             Date currentDate = new SimpleDateFormat("dd-MM-yyyy").parse(thisDate);//Create a current date from thisDate
             Date datetoCompare = new SimpleDateFormat("dd-MM-yyyy").parse(mBestbyDate);//Create a date from product best by
-            Log.d("TAG", "Date to compare "+datetoCompare);
-            Log.d("TAG", "Current date "+currentDate);
+            Log.d("TAG", "Date to compare " + datetoCompare);
+            Log.d("TAG", "Current date " + currentDate);
 
             assert datetoCompare != null;
-            if (datetoCompare.before(currentDate)){//See if the date has passed
+            if (datetoCompare.before(currentDate)) {//See if the date has passed
                 Log.d("TAG", "Date has passed");
-                expiredItem(position,holder);//Call the expired func with positions affected, it will then flag them to user
-            }else{
+                expiredItem(position, holder);//Call the expired func with positions affected, it will then flag them to user
+            } else {
                 Log.d("TAG", "Date has not passed");
             }
-/*//TODO make date comparissons to make more detailed show to user of how expired smt is
-
-
+/*
+            Kinda janky date getting:
             freshCalendar.add(Calendar.DAY_OF_YEAR,3);
             String threeDaysTime=newDateFormat.format(freshCalendar.getTime());
             datetoCompare=new SimpleDateFormat("dd-MM-yyyy").parse(threeDaysTime);
-
-
-
             DateTimeFormatter dtf= DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDateTime date1 = LocalDateTime.parse(threeDaysTime,dtf);
             LocalDateTime date2 = LocalDateTime.parse(thisDate,dtf);
-
-
             long daysBetween= ChronoUnit.DAYS.between(date1,date2);
             Log.d("TAG", "Days between"+daysBetween);
 */
         } catch (ParseException e) {
-       //     e.printStackTrace();
-            Log.d("TAG", "Ingredient Adapter: Inside catch on Date checking"+e);
+            //     e.printStackTrace();
+            Log.d("TAG", "Ingredient Adapter: Inside catch on Date checking" + e);
         }
 
     }
 
-    public void expiredItem(int position,ExampleViewHolder holder){
-        Log.d("TAG", "Expired item at position: "+position);
-            holder.expired.setVisibility(View.VISIBLE);//Show user an expired item warning
+    public void expiredItem(int position, ExampleViewHolder holder) {
+        Log.d("TAG", "Expired item at position: " + position);
+        holder.expired.setVisibility(View.VISIBLE);//Show user an expired item warning
     }
 }
