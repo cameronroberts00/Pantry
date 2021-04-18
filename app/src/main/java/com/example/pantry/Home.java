@@ -1,6 +1,8 @@
 package com.example.pantry;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -15,14 +17,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.MediaController;
+import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -74,7 +82,8 @@ public class Home extends Fragment {
     private ConstraintLayout timeout;
     private Button refresh;
     private boolean loaded = false;//this sets to true once jsonarray with content comes thru. if it hasnt set to true in 10 seconds, tell user to check internet/reload etc.
-
+   // private boolean firstTime=true;//This is used to trigger tutorial popup option
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -103,10 +112,48 @@ public class Home extends Fragment {
         checkTimeout();
         loadContent();
 
+       // checkTutorial();//check if its first time opening, if so, show tutorial as option
         return view;
     }
 
-    private void checkTimeout() {
+  /*  VideoView tutorial;
+    MediaController mediaController;
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkTutorial(){
+        //Check whether this is first time opening the app
+        SharedPreferences firstHolder = getContext().getSharedPreferences("firstStatus", 0);
+        firstTime = firstHolder.getBoolean("firstStatus", true);
+        Log.d("TAG", "Is first opening: "+firstTime);
+
+
+
+        if(firstTime){//If it is the first time, open a popup and save the fact that first time is now false
+            firstHolder.edit().putBoolean("firstStatus", false).apply();
+
+        }
+    }
+*/
+   /* @RequiresApi(api = Build.VERSION_CODES.M)
+    public void triggerPopup() {
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View popup = inflater.inflate(R.layout.tutorial_popup, (ViewGroup) view.getParent(), false);
+
+
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final PopupWindow popupWindow = new PopupWindow(popup, width, height, true);
+        popupWindow.setEnterTransition(new Slide());
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+
+        tutorial = (VideoView) popup.findViewById(R.id.videoView);
+        mediaController = new MediaController(getContext());
+        String path = "android.resource://com.example.pantry/" + R.raw.ham;
+        Uri u = Uri.parse(path);
+        tutorial.setVideoURI(u);
+        tutorial.start();
+    }*/
+        private void checkTimeout() {
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
@@ -145,6 +192,7 @@ public class Home extends Fragment {
         mRecyclerView2.setAdapter(mAdapter2);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void loadContent() {
         try {
             loading.setVisibility(View.VISIBLE);
@@ -155,6 +203,7 @@ public class Home extends Fragment {
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
+                              //  triggerPopup();
                                 loading.setVisibility(View.INVISIBLE);
                                 loaded = true;
                                 content.setVisibility(View.VISIBLE);//hide content while its just empty
@@ -211,6 +260,7 @@ public class Home extends Fragment {
                 }
             });
             mQueue.add(request);//add the call to the volley queue
+
         } catch (Exception e) {
             Log.d("TAG", "Failed to get content in home!\n" + e);
         }

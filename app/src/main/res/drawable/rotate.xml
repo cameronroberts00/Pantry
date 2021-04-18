@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rotate xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@mipmap/can_foreground"
+    android:drawable="@mipmap/pantry_black_foreground"
     android:fillAfter="false"
     android:fromDegrees="0"
     android:interpolator="@android:anim/linear_interpolator"

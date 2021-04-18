@@ -96,6 +96,7 @@ public class AddRecipe extends Fragment {
     String urlBarcode;// 9780140157376 <- example of barcode appearance
     String urlEnd = "&code=";
     public boolean scanOnce = false;//just a lil bool to stop continous scanning
+    ArrayList<IngredientItem> mIngredientList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -128,8 +129,9 @@ public class AddRecipe extends Fragment {
     }
 
     public void getCategory(String categoryUppercased) {
-        Log.d("TAG", "Received category of: " + categoryUppercased);
+        Log.d("TAG", "Received category of: " + categoryUppercased);//say what category is getting chucked into the sorter
         //This is a category sorter. when called in for loop it goes thru all product categories and finds most identifiable one. For example, If a product has: "Milk, Vegan, Dairy" as categories, obviously milk is the main identifiable one for a human.
+        //Most products tested have like 5-6 categories, all relatively vague so this should pick up a good chunk and give alright date estimates
         switch (categoryUppercased) {
             case "COOKED":
                 bestby = 2;
@@ -148,11 +150,14 @@ public class AddRecipe extends Fragment {
             case "YOGHURT":
             case "YOGURT":
             case "FRUIT":
+            case "CREAM":
+            case "CREME":
                 bestby = 5;
                 getDate(bestby);
                 category = categoryUppercased;//swap categoryuppercased into category. For example, this puts value of "milk"  into category. Because saying categoryUppercased after switch will show the first category on the product, not the main identifying one which is milk. itd show "Vegan" etc. this is because we are going through a for loop, and 1st item might not be correct category
                 break;
             case "VEGETABLE":
+            case "LEGUME":
                 bestby = 6;
                 getDate(bestby);
                 category = categoryUppercased;
@@ -163,7 +168,7 @@ public class AddRecipe extends Fragment {
                 category = categoryUppercased;
                 break;
             case "JUICE":
-                bestby = 30;
+                bestby = 14;
                 getDate(bestby);
                 category = categoryUppercased;
                 break;
@@ -172,11 +177,18 @@ public class AddRecipe extends Fragment {
             case "CANDY":
             case "CONFECTIONERY":
             case "JAM":
+            case "MAYO":
+            case "MAYONNAISE":
+            case "KETCHUP":
+            case "CONDIMENT":
+            case "SAUCE":
+            case "SALAD CREAM":
                 bestby = 180;
                 getDate(bestby);
                 category = categoryUppercased;
                 break;
             case "FROZEN":
+            case "ICECREAM":
             case "ICE":
             case "ICED":
             case "TIN":
@@ -190,12 +202,15 @@ public class AddRecipe extends Fragment {
             case "SUGAR":
             case "HONEY":
             case "CEREAL":
+            case "COFFEE":
+            case "TEA":
+            case "NUTS":
                 bestby = 365;
                 getDate(bestby);
                 category = categoryUppercased;
                 break;
             default:
-                //dont put owt here as it is called for every category in the category array (the api provides many categories)
+                //dont put owt here as it is called each time for every category in the category array (the api provides many categories)
                 break;
         }
     }
@@ -209,7 +224,6 @@ public class AddRecipe extends Fragment {
         Log.d("TAG", "Date set as:" + bestByDate);
     }
 
-    ArrayList<IngredientItem> mIngredientList;
 
     private void jsonParse(String url) {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -338,7 +352,7 @@ public class AddRecipe extends Fragment {
         editor.putString("ingredient list", json);
         editor.apply();
         resetTexts();
-        category = null;//TODO if categories start messing up, check this line here
+        category = null;/* if categories start messing up, check this line here*/
     }
 
     private void resetTexts() {
@@ -384,6 +398,7 @@ public class AddRecipe extends Fragment {
             @Override
             public void release() {
             }
+
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();

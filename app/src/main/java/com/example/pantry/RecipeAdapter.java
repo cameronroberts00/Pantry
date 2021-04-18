@@ -13,6 +13,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -155,6 +156,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
         for (int i = 0; i < splitMissing.length; i++) {
             getImage(splitMissing[i]);
         }
+        Toast.makeText(mContext,"Items added to your shopping list!",Toast.LENGTH_SHORT).show();
         save();//save the shopping list
     }
 
