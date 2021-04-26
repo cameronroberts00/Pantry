@@ -3,12 +3,16 @@ package com.example.pantry;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -28,6 +32,8 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -46,6 +52,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
         public TextView productCategory;
         public TextView productBestByDate;
         public TextView expired;
+        public ImageView colourIndicator;
         final public Button deleteButton;
         final public Button savedItemButton;
 
@@ -57,8 +64,10 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
             expired = itemView.findViewById(R.id.expired);
             deleteButton = itemView.findViewById(R.id.deleteButton);
             savedItemButton = itemView.findViewById(R.id.savedButton);
+            colourIndicator=itemView.findViewById(R.id.colour_indicator);
             deleteButton.setOnClickListener(listener);
             savedItemButton.setOnClickListener(listener);
+
 
         }
 
@@ -126,6 +135,9 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
         holder.productCategory.setText(currentItem.getCategory());
         holder.productBestByDate.setText(currentItem.getBestByDate());
         holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
+
+   //     holder.colourIndicator.setColorFilter(R.color.mainGreen);
+
         checkExpiry(currentItem.getBestByDate(), position, holder);//Send each date to check if its expired when page loads
     }
 

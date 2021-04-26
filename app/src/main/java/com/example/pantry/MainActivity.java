@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -88,5 +89,11 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.progressFrame, fragment);
         transaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {//catch on back presses and do nothing. stops fragments stacking infinitely if user keeps going home>add item>back>home>add item>back
+       // super.onBackPressed();
+        Log.d("TAG", "onBackPressed:");
     }
 }

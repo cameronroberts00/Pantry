@@ -152,12 +152,16 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
     private void addMissingToShopping(RecipeItem currentItem) {
         //This grabs all the missing items off the current item (as user clicked it), then takes them apart so theyre individual items and adds them to their shopping list
         currentItem.getMissing();
-        String[] splitMissing = currentItem.getMissing().toString().replace("[", "").replace("]", "").split(", ");
-        for (int i = 0; i < splitMissing.length; i++) {
-            getImage(splitMissing[i]);
+        if(currentItem.getMissing().size()!=0) {
+            String[] splitMissing = currentItem.getMissing().toString().replace("[", "").replace("]", "").split(", ");
+            for (int i = 0; i < splitMissing.length; i++) {
+                getImage(splitMissing[i]);
+            }
+            Toast.makeText(mContext, "Items added to your shopping list!", Toast.LENGTH_SHORT).show();
+            save();//save the shopping list
+        }else{
+            Toast.makeText(mContext, "No items missing!", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(mContext,"Items added to your shopping list!",Toast.LENGTH_SHORT).show();
-        save();//save the shopping list
     }
 
     private void getImage(String i) {

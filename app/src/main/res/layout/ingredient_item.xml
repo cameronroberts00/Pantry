@@ -9,8 +9,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_margin="4dp">
+        android:layout_height="150dp">
 
         <Button
             android:id="@+id/deleteButton"
@@ -25,32 +24,39 @@
             android:text="item binned"
             app:backgroundTint="@color/errorCodeRed"
             app:cornerRadius="20dp"
+
             app:iconPadding="4dp" />
 
         <Button
             android:id="@+id/savedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="14dp"
             android:layout_marginRight="7dp"
             android:layout_marginBottom="7dp"
+            android:layout_toStartOf="@+id/colour_indicator"
+            android:layout_toLeftOf="@+id/colour_indicator"
             android:text="Item saved"
             app:backgroundTint="@color/mainGreen"
             app:cornerRadius="20dp"
             app:iconPadding="4dp" />
 
-        <TextView
-            android:id="@+id/product_bestby"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/product_category"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:text="Product Best by date"
-            android:textSize="15sp" />
+        <ImageView
+            android:id="@+id/colour_indicator"
+            android:layout_width="23dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+            android:scaleType="centerCrop"
+            app:srcCompat="@android:drawable/screen_background_dark"
+            app:tintMode="multiply" />
 
         <TextView
             android:id="@+id/expired"
@@ -87,6 +93,16 @@
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:text="Product Category"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/product_bestby"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/product_category"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="Product Best by date"
             android:textSize="15sp" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
