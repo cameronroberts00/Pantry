@@ -44,7 +44,7 @@
 
         <ImageView
             android:id="@+id/colour_indicator"
-            android:layout_width="23dp"
+            android:layout_width="12dp"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
@@ -55,7 +55,7 @@
             android:adjustViewBounds="false"
             android:cropToPadding="false"
             android:scaleType="centerCrop"
-            app:srcCompat="@android:drawable/screen_background_dark"
+            app:srcCompat="@android:drawable/screen_background_light"
             app:tintMode="multiply" />
 
         <TextView

@@ -6,4 +6,5 @@
     <color name="mainGreen">#FF4CAF50</color>
     <color name="genericButton">#C6C6C6</color>
     <color name="errorCodeRed">#FF4E47</color>
+    <color name="warmOrange">#ff9412</color>
 </resources>

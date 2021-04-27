@@ -1,8 +1,10 @@
 package com.example.pantry;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -83,7 +86,9 @@ public class Storeroom extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void buildRecyclerView() {
+        //mIngredientList.sort(Comparator.comparing(o -> mIngredientList.get(0).getBestByDate()));
         mRecyclerView = view.findViewById(R.id.recyclerview);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getContext());

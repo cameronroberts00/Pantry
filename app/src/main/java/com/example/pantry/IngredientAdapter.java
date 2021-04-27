@@ -136,7 +136,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
         holder.productBestByDate.setText(currentItem.getBestByDate());
         holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
 
-   //     holder.colourIndicator.setColorFilter(R.color.mainGreen);
+        holder.colourIndicator.setColorFilter(mContext.getResources().getColor(R.color.mainGreen), PorterDuff.Mode.MULTIPLY);
 
         checkExpiry(currentItem.getBestByDate(), position, holder);//Send each date to check if its expired when page loads
     }
@@ -161,6 +161,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
             Log.d("TAG", "Date to compare " + datetoCompare);
             Log.d("TAG", "Current date " + currentDate);
 
+            //Check if items expired
             assert datetoCompare != null;
             if (datetoCompare.before(currentDate)) {//See if the date has passed
                 Log.d("TAG", "Date has passed");
@@ -168,17 +169,23 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Ex
             } else {
                 Log.d("TAG", "Date has not passed");
             }
-/*
-            Kinda janky date getting:
-            freshCalendar.add(Calendar.DAY_OF_YEAR,3);
-            String threeDaysTime=newDateFormat.format(freshCalendar.getTime());
-            datetoCompare=new SimpleDateFormat("dd-MM-yyyy").parse(threeDaysTime);
-            DateTimeFormatter dtf= DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDateTime date1 = LocalDateTime.parse(threeDaysTime,dtf);
-            LocalDateTime date2 = LocalDateTime.parse(thisDate,dtf);
-            long daysBetween= ChronoUnit.DAYS.between(date1,date2);
-            Log.d("TAG", "Days between"+daysBetween);
-*/
+
+            //Show colours corresponding to the date
+            //Calendar instances for first if statement (adding 2 days)
+            freshCalendar.add(Calendar.DATE,2);
+           // newDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            Date currentDateAdd2=new SimpleDateFormat("dd-MM-yyyy").parse(newDateFormat.format(freshCalendar.getTime()));
+
+            //Calendar instances for second if statement (adding 2 days, totalling 4 days (adds to 2 days already defined, see above.))
+            freshCalendar.add(Calendar.DATE, 2);
+            Date currentDateAdd4=new SimpleDateFormat("dd-MM-yyyy").parse(newDateFormat.format(freshCalendar.getTime()));
+
+            if(datetoCompare.before(currentDateAdd2)){//if date is expired or on day of expiry or day of expiry+1, make the colour indicator red
+                holder.colourIndicator.setColorFilter(mContext.getResources().getColor(R.color.errorCodeRed), PorterDuff.Mode.MULTIPLY);
+            }else if(datetoCompare.before(currentDateAdd4)&&!datetoCompare.after(currentDateAdd2)){//if date is after the above statement and before 2 days later
+                holder.colourIndicator.setColorFilter(mContext.getResources().getColor(R.color.warmOrange), PorterDuff.Mode.MULTIPLY);
+            }
+
         } catch (ParseException e) {
             //     e.printStackTrace();
             Log.d("TAG", "Ingredient Adapter: Inside catch on Date checking" + e);
