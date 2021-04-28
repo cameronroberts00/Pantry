@@ -17,20 +17,20 @@
 
         <Button
             android:id="@+id/add_to_shopping"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
+            android:layout_width="217dp"
+            android:layout_height="37dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="11dp"
-            android:layout_marginRight="11dp"
-            android:layout_marginBottom="3dp"
-            android:text="add missing items to shopping list"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginRight="-1dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/heart"
+            android:layout_toLeftOf="@+id/heart"
+            android:text="add missing to shopping list"
             android:textColor="#FFFFFF"
             android:textSize="10sp"
             app:backgroundTint="@color/genericButton"
             app:cornerRadius="20dp"
-            app:iconPadding="4dp" />
+            app:iconPadding="1dp" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -109,6 +109,18 @@
             android:text="Ingredient Match:"
             android:textColor="@color/mainGreen"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/heart"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginRight="-1dp"
+            android:layout_marginBottom="0dp"
+            app:srcCompat="@mipmap/heart_foreground" />
 
     </RelativeLayout>
 

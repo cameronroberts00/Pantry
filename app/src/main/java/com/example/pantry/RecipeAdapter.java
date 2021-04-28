@@ -46,6 +46,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
     private Context mContext;
     public CardView recipeContainer;
     public Button addToShopping;
+    private ImageView heart;
+    boolean isHearted=false;
     private RequestQueue mQueue, mQueue2;
     public ArrayList<ShoppingListItem> mShoppingList;
     public String image;//(this is image address sent as string to the shopping list for missing items)
@@ -65,6 +67,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
             usedIngredients = itemView.findViewById(R.id.usedText);
             addToShopping = itemView.findViewById(R.id.add_to_shopping);
             recipeContainer = itemView.findViewById(R.id.recipe_container);
+            heart=itemView.findViewById(R.id.heart);
             mQueue = Volley.newRequestQueue(mContext);
             mQueue2 = Volley.newRequestQueue(mContext);
         }
@@ -127,14 +130,17 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
         //      clipBody(holder);//clip the text body if its too long
         // }
 
-        //There's two onclick listeners here instead of one just because it really was not having a fun time with 1 listener and a switch statement
+        //There's 3 onclick listeners here instead of 1 just because it really was not having a fun time with 1 listener and a switch statement, it might be because its in a recyclerview, i dont know
         recipeContainer.setOnClickListener(new View.OnClickListener() {//if a tip is clicked, open it
             @Override
             public void onClick(View view) {
                 Log.d("TAG", "clicked " + holder.getAdapterPosition() + " " + currentItem.getTitle() + " " + currentItem.getId());
-                getWebUrl(currentItem.getId());
+               // getWebUrl(currentItem.getId());
+               // getWebUrl(currentItem.getId());
+                //todo sort this shit -- check it actually is fixed
+                getWebUrl(mRecipeList.get(holder.getAdapterPosition()).getId());
+                Log.d("TAG", "loading url for "+mRecipeList.get(holder.getAdapterPosition()).getTitle());
                 //  openTip(position,holder,view);
-
             }
         });
         addToShopping.setOnClickListener(new View.OnClickListener() {
@@ -142,6 +148,33 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
             public void onClick(View view) {
                 Log.d("TAG", "Adding to shopping list: " + currentItem.getMissing());
                 addMissingToShopping(currentItem);
+            }
+        });
+        heart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("TAG", "Item hearted: "+currentItem.getTitle());
+           //     heart.setBackgroundResource(R.mipmap.heartcoloured_foreground);
+
+            //   Glide.with(mContext).load(R.mipmap.heartcoloured_foreground).into(heart);
+           //     Toast.makeText(mContext,"Added "+currentItem.getTitle()+" to favourites", Toast.LENGTH_SHORT).show();
+
+               // notifyItemRemoved(currentItem);
+              /*  int removeThis=holder.getAdapterPosition();
+                try{
+                    mRecipeList.remove(position);
+                    notifyItemChanged(position);
+                    notifyItemRemoved(position);
+                    Toast.makeText(mContext,"clicked "+position, Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                    notifyDataSetChanged();
+                    Toast.makeText(mContext,"FAILED "+position, Toast.LENGTH_SHORT).show();
+                }*/
+
+
+
+                Log.d("TAG", position+" is where we is");
             }
         });
         // holder.productBestByDate.setText(currentItem.getBestByDate());
