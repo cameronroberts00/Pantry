@@ -18,9 +18,13 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -38,6 +42,8 @@ public class Storeroom extends Fragment {
     boolean recyclerIsBuilt = false;
     View view;
     View emptyContainer;
+    TextView newestButton;
+    TextView oldestButton;
     ArrayList<IngredientItem> mIngredientList;
     private RecyclerView mRecyclerView;
     private IngredientAdapter mAdapter;
@@ -50,6 +56,10 @@ public class Storeroom extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_storeroom, container, false);
         emptyContainer = view.findViewById(R.id.emptyContainer);
+        newestButton = view.findViewById(R.id.newestButton);
+        oldestButton = view.findViewById(R.id.oldestButton);
+        newestButton.setOnClickListener(listener);
+        oldestButton.setOnClickListener(listener);
         loadData();
         buildRecyclerView();
         return view;
@@ -86,18 +96,38 @@ public class Storeroom extends Fragment {
         }
     }
 
+    View.OnClickListener listener = new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.newestButton:
+                    sortExpireLast();
+                    break;
+                case R.id.oldestButton:
+                    sortExpireFirst();
+                    break;
+            }
+        }
+    };
+
+    //Push expiring items to top
     private void sortExpireFirst() {
         Collections.sort(mIngredientList, new DateSort());
         if (recyclerIsBuilt) {//if recycler is built, then show the changes (stops calling notifyDataSetChanged during recycler build process, causing crash)
             mAdapter.notifyDataSetChanged();
+            Toast.makeText(getContext(),"Sorted by: Expired items first", Toast.LENGTH_SHORT).show();
         }
     }
 
+    //Push freshers items to top
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void sortExpireLast() {
         Collections.sort(mIngredientList, new DateSort().reversed());
         if (recyclerIsBuilt) {
+            //Only notify data change + show user feedback if this isnt the first call and recycler is already built
             mAdapter.notifyDataSetChanged();
+            Toast.makeText(getContext(),"Sorted by: Expired items last", Toast.LENGTH_SHORT).show();
         }
     }
 
