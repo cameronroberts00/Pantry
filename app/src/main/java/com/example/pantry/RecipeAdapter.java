@@ -68,6 +68,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
             addToShopping = itemView.findViewById(R.id.add_to_shopping);
             recipeContainer = itemView.findViewById(R.id.recipe_container);
             heart=itemView.findViewById(R.id.heart);
+            heart.setVisibility(View.INVISIBLE);//Not using heart feature currently, set view invisible instead of deleting just so its easier to reimplement
             mQueue = Volley.newRequestQueue(mContext);
             mQueue2 = Volley.newRequestQueue(mContext);
         }
@@ -134,10 +135,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
         recipeContainer.setOnClickListener(new View.OnClickListener() {//if a tip is clicked, open it
             @Override
             public void onClick(View view) {
-                Log.d("TAG", "clicked " + holder.getAdapterPosition() + " " + currentItem.getTitle() + " " + currentItem.getId());
+                Log.d("TAG", "clicked " + holder.getAdapterPosition() + " " + mRecipeList.get(holder.getAdapterPosition()).getTitle() + " " + mRecipeList.get(holder.getAdapterPosition()).getId());
                // getWebUrl(currentItem.getId());
                // getWebUrl(currentItem.getId());
-                //todo sort this shit -- check it actually is fixed
+
                 getWebUrl(mRecipeList.get(holder.getAdapterPosition()).getId());
                 Log.d("TAG", "loading url for "+mRecipeList.get(holder.getAdapterPosition()).getTitle());
                 //  openTip(position,holder,view);
@@ -146,37 +147,32 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
         addToShopping.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("TAG", "Adding to shopping list: " + currentItem.getMissing());
-                addMissingToShopping(currentItem);
+                Log.d("TAG", "Adding to shopping list: " + mRecipeList.get(holder.getAdapterPosition()).getMissing());
+                addMissingToShopping(mRecipeList.get(holder.getAdapterPosition()));
             }
         });
+       /* This heart feature just didnt really work well, when removing items from the list it would sometimes get out of bounds errors or end up in the catch from doing a Toast.makeText (??)
         heart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("TAG", "Item hearted: "+currentItem.getTitle());
+              //  Log.d("TAG", "Item hearted: "+currentItem.getTitle());
            //     heart.setBackgroundResource(R.mipmap.heartcoloured_foreground);
-
             //   Glide.with(mContext).load(R.mipmap.heartcoloured_foreground).into(heart);
            //     Toast.makeText(mContext,"Added "+currentItem.getTitle()+" to favourites", Toast.LENGTH_SHORT).show();
-
                // notifyItemRemoved(currentItem);
-              /*  int removeThis=holder.getAdapterPosition();
                 try{
-                    mRecipeList.remove(position);
-                    notifyItemChanged(position);
-                    notifyItemRemoved(position);
-                    Toast.makeText(mContext,"clicked "+position, Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(mContext,"Added "+mRecipeList.get(holder.getAdapterPosition()).getTitle()+" to your favourites!", Toast.LENGTH_SHORT).show();
+                    mRecipeList.remove(mRecipeList.get(holder.getLayoutPosition()));
+                    notifyItemChanged(holder.getLayoutPosition());
+                    notifyItemRemoved(holder.getLayoutPosition());
+                  //  Log.d("TAG", "Item added to favourites "+mRecipeList.get(holder.getAdapterPosition()).getTitle());
                 }catch (Exception e){
                     e.printStackTrace();
+                    Toast.makeText(mContext,"FAILED to add "+mRecipeList.get(holder.getAdapterPosition()).getTitle(), Toast.LENGTH_SHORT).show();
                     notifyDataSetChanged();
-                    Toast.makeText(mContext,"FAILED "+position, Toast.LENGTH_SHORT).show();
-                }*/
-
-
-
-                Log.d("TAG", position+" is where we is");
+                }
             }
-        });
+        });*/
         // holder.productBestByDate.setText(currentItem.getBestByDate());
         // holder.expired.setVisibility(View.INVISIBLE);//Recyclerviews automatically set everything to visible, manually set each expiry warning to invisible
         // Log.d("TAG", "Tip name"+currentItem.getName());
@@ -184,11 +180,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ExampleVie
 
     private void addMissingToShopping(RecipeItem currentItem) {
         //This grabs all the missing items off the current item (as user clicked it), then takes them apart so theyre individual items and adds them to their shopping list
-        currentItem.getMissing();
+      //  currentItem.getMissing();
         if(currentItem.getMissing().size()!=0) {
             String[] splitMissing = currentItem.getMissing().toString().replace("[", "").replace("]", "").split(", ");
             for (int i = 0; i < splitMissing.length; i++) {
                 getImage(splitMissing[i]);
+                Log.d("TAG", "Missing saved: "+splitMissing[i]);
             }
             Toast.makeText(mContext, "Items added to your shopping list!", Toast.LENGTH_SHORT).show();
             save();//save the shopping list
