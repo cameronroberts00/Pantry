@@ -1,5 +1,7 @@
 package com.example.pantry;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -15,8 +17,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
@@ -77,12 +81,18 @@ public class Home extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager, mLayoutManager2;
     private ImageView featuredImage;
     private CardView featured;
+    private CardView tutorialHint;
+    boolean loadHint=true;
+    private Button yesTutorial;
+    private Button noTutorial;
+    private TextView neverTutorial;
     private ScrollView content;
     private ConstraintLayout loading;
     private ConstraintLayout timeout;
     private Button refresh;
     private boolean loaded = false;//this sets to true once jsonarray with content comes thru. if it hasnt set to true in 10 seconds, tell user to check internet/reload etc.
-   // private boolean firstTime=true;//This is used to trigger tutorial popup option
+
+    // private boolean firstTime=true;//This is used to trigger tutorial popup option
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,6 +107,13 @@ public class Home extends Fragment {
 
         buildRecycler1();
         buildRecycler2();
+        tutorialHint = view.findViewById(R.id.tutorial_hint);
+        yesTutorial = view.findViewById(R.id.yes);
+        yesTutorial.setOnClickListener(listener);
+        noTutorial = view.findViewById(R.id.no);
+        noTutorial.setOnClickListener(listener);
+        neverTutorial = view.findViewById(R.id.never);
+        neverTutorial.setOnClickListener(listener);
         featuredImage = view.findViewById(R.id.featured_image);
         featured = view.findViewById(R.id.featured_holder);
         loading = view.findViewById(R.id.loading);
@@ -108,52 +125,49 @@ public class Home extends Fragment {
         refresh.setOnClickListener(listener);
         featuredName = view.findViewById(R.id.featured_name);
         mQueue = Volley.newRequestQueue(getActivity());
-
+tutorialHint.setVisibility(View.GONE);
         checkTimeout();
         loadContent();
-
-       // checkTutorial();//check if its first time opening, if so, show tutorial as option
+        loadHint();
+        // checkTutorial();//check if its first time opening, if so, show tutorial as option
         return view;
     }
 
-  /*  VideoView tutorial;
-    MediaController mediaController;
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void checkTutorial(){
-        //Check whether this is first time opening the app
-        SharedPreferences firstHolder = getContext().getSharedPreferences("firstStatus", 0);
-        firstTime = firstHolder.getBoolean("firstStatus", true);
-        Log.d("TAG", "Is first opening: "+firstTime);
 
+    private void loadHint() {
+        //check if user has opted out of tutorial popup, if not, show them
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        loadHint=prefs.getBoolean("loadHint",true);
+        if(loadHint) {
+            new CountDownTimer(1500, 100) {
+                public void onTick(long millisUntilFinished) {
+                    //necessary method in countdown timer thats called each interval
+                }
 
-
-        if(firstTime){//If it is the first time, open a popup and save the fact that first time is now false
-            firstHolder.edit().putBoolean("firstStatus", false).apply();
-
+                @Override
+                public void onFinish() {
+                    tutorialHint.setVisibility(View.VISIBLE);
+                    tutorialHint.setAlpha(0.0f);
+                    tutorialHint.animate()
+                            .translationY(-100)
+                            .alpha(0.0f)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    tutorialHint.animate()
+                                            .translationY(0)
+                                            .alpha(1.0f)
+                                            .setListener(null).setDuration(300);
+                                }
+                            });
+                }
+            }.start();
         }
+
     }
-*/
-   /* @RequiresApi(api = Build.VERSION_CODES.M)
-    public void triggerPopup() {
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View popup = inflater.inflate(R.layout.tutorial_popup, (ViewGroup) view.getParent(), false);
 
-
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        final PopupWindow popupWindow = new PopupWindow(popup, width, height, true);
-        popupWindow.setEnterTransition(new Slide());
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-
-        tutorial = (VideoView) popup.findViewById(R.id.videoView);
-        mediaController = new MediaController(getContext());
-        String path = "android.resource://com.example.pantry/" + R.raw.ham;
-        Uri u = Uri.parse(path);
-        tutorial.setVideoURI(u);
-        tutorial.start();
-    }*/
-        private void checkTimeout() {
+    private void checkTimeout() {
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
@@ -203,7 +217,7 @@ public class Home extends Fragment {
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
-                              //  triggerPopup();
+                                //  triggerPopup();
                                 loading.setVisibility(View.INVISIBLE);
                                 loaded = true;
                                 content.setVisibility(View.VISIBLE);//hide content while its just empty
@@ -318,17 +332,44 @@ public class Home extends Fragment {
 
 
                     activity.getSupportFragmentManager().beginTransaction().replace(R.id.frame, openedTip).addToBackStack(null).commit();
-                    //todo deal with featured holder taps
-                    //todo add items to bundle, send this with new fragment instannce of openedtip.java
+
                     break;
                 case R.id.refresh://user timed out, this reloads frag
                     Fragment home = new Home();
                     AppCompatActivity reload = (AppCompatActivity) view.getContext();
                     reload.getSupportFragmentManager().beginTransaction().replace(R.id.frame, home).addToBackStack(null).commit();
                     break;
+                case R.id.yes:
+                    TutorialsPage tutorialsPage = new TutorialsPage();
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame,tutorialsPage).addToBackStack(null).commit();
+                    break;
+                case R.id.no:
+                    animateLeave();
+                    break;
+                case R.id.never:
+                animateLeave();
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    prefs.edit().putBoolean("loadHint", false).apply();
+                    break;
             }
         }
     };
+
+    private void animateLeave(){
+        //animate an exit on the hint then close the popup
+        tutorialHint.animate()
+                .translationY(-100)
+                .alpha(0.0f).setDuration(400)
+                .setListener(new AnimatorListenerAdapter() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        tutorialHint.setVisibility(View.GONE);
+                    }
+                });
+
+    }
 
     public void sortCategories(String category) {
         if (category.equals("waste")) {//If first category, chuck it in the first recycler

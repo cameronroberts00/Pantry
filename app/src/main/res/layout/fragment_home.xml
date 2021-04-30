@@ -20,12 +20,89 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/tutorial_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="visible"
+                app:cardCornerRadius="20dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="125dp">
+
+                    <Button
+                        android:id="@+id/yes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/textView17"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="11dp"
+                        android:layout_marginEnd="94dp"
+                        android:layout_marginRight="94dp"
+                        android:text="yes"
+                        app:backgroundTint="@color/mainGreen"
+                        app:cornerRadius="20dp"
+                        app:iconPadding="4dp" />
+
+                    <Button
+                        android:id="@+id/no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@+id/yes"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginEnd="31dp"
+                        android:layout_marginRight="31dp"
+                        android:layout_toStartOf="@+id/yes"
+                        android:layout_toLeftOf="@+id/yes"
+                        android:text="no"
+                        app:backgroundTint="@color/genericButton"
+                        app:cornerRadius="20dp"
+                        app:iconPadding="4dp" />
+
+                    <TextView
+                        android:id="@+id/textView17"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+
+                        android:layout_marginTop="5dp"
+                        android:gravity="center"
+                        android:text="Would you like to view tutorials? "
+                        android:textColor="@color/mainGreen"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/never"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/yes"
+                        android:layout_marginTop="8dp"
+                        android:foregroundGravity="center"
+                        android:gravity="center"
+                        android:text="@string/never"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
             <TextView
                 android:id="@+id/tipname1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/tutorial_hint"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="0dp"
                 android:text="Food Waste Tips"
                 android:textColor="@color/mainGreen"
                 android:textSize="24sp"
@@ -160,6 +237,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Refresh"
+            app:backgroundTint="@color/mainGreen"
+            app:cornerRadius="20dp"
+            app:iconPadding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
         <TextView
             android:id="@+id/textView6"
             android:layout_width="wrap_content"
@@ -173,19 +263,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Refresh"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView6"
-            app:backgroundTint="@color/mainGreen"
-            app:cornerRadius="20dp"
-            app:iconPadding="4dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

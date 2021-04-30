@@ -5,4 +5,5 @@
     <string name="oldest"> <u>Oldest First</u> </string>
     <string name="newest"> <u>Newest First</u> </string>
     <string name="add_manually"><u>Add product manually</u></string>
+    <string name="never"><u>No, do not ask again</u></string>
 </resources>
