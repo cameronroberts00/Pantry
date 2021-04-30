@@ -325,8 +325,9 @@ public class AddRecipe extends Fragment {
         saveData();
     }
 
-    private void cancelSelection() {//dont actually need to clear anything here as if it isnt saved, the next time the barcode sees something it will overwrite anyway. this is purely aesthetics for the user
+    private void cancelSelection() {
         productInfo.setVisibility(View.INVISIBLE);
+        category=null;// if breaks. clear this.
         resetTexts();
         scanOnce = false;//allow scanning again
     }
@@ -352,6 +353,7 @@ public class AddRecipe extends Fragment {
         editor.putString("ingredient list", json);
         editor.apply();
         resetTexts();
+        Toast.makeText(getContext(), "Item Saved!", Toast.LENGTH_SHORT).show();
         category = null;/* if categories start messing up, check this line here*/
     }
 

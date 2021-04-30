@@ -96,6 +96,14 @@ public class TutorialsPage extends Fragment {
                     break;
                 case R.id.addingBarcode:
                     Toast.makeText(getContext(), "Playing: Adding Products by Barcode Tutorial", Toast.LENGTH_SHORT).show();
+                    videoView.setVideoURI(Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.barcode));
+                    videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            mp.setLooping(true);
+                            videoView.start();
+                        }
+                    });
                     break;
                 case R.id.back:
                     Fragment home = new Home();

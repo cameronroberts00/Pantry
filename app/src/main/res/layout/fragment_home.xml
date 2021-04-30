@@ -35,37 +35,39 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="125dp">
+                    android:layout_height="115dp">
 
-                    <Button
-                        android:id="@+id/yes"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/linear"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/textView17"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginTop="11dp"
-                        android:layout_marginEnd="94dp"
-                        android:layout_marginRight="94dp"
-                        android:text="yes"
-                        app:backgroundTint="@color/mainGreen"
-                        app:cornerRadius="20dp"
-                        app:iconPadding="4dp" />
-
-                    <Button
-                        android:id="@+id/no"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignTop="@+id/yes"
                         android:layout_marginTop="0dp"
-                        android:layout_marginEnd="31dp"
-                        android:layout_marginRight="31dp"
-                        android:layout_toStartOf="@+id/yes"
-                        android:layout_toLeftOf="@+id/yes"
-                        android:text="no"
-                        app:backgroundTint="@color/genericButton"
-                        app:cornerRadius="20dp"
-                        app:iconPadding="4dp" />
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/no"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:layout_marginTop="0dp"
+                            android:text="no"
+                            app:backgroundTint="@color/genericButton"
+                            app:cornerRadius="20dp"
+                            app:iconPadding="4dp" />
+
+                        <Button
+                            android:id="@+id/yes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_margin="4dp"
+                            android:text="yes"
+                            app:backgroundTint="@color/mainGreen"
+                            app:cornerRadius="20dp"
+                            app:iconPadding="4dp" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/textView17"
@@ -84,8 +86,7 @@
                         android:id="@+id/never"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/yes"
-                        android:layout_marginTop="8dp"
+                        android:layout_below="@id/linear"
                         android:foregroundGravity="center"
                         android:gravity="center"
                         android:text="@string/never"
