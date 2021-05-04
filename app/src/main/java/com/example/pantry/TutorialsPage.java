@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.preference.PreferenceManager;
@@ -25,7 +26,8 @@ public class TutorialsPage extends Fragment {
     }
 
     private VideoView videoView;
-    private Button storeroom, addItemM, addItemB, findRecipe, back;
+    private CardView storeroom, addItemM, addItemB, findRecipe;
+    private Button back;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
