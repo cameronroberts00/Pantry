@@ -24,7 +24,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -52,7 +56,7 @@ import java.util.Date;
 import static android.content.Context.MODE_PRIVATE;
 
 
-public class Recipes extends Fragment {
+public class Recipes extends Fragment /*implements NumberPicker.OnValueChangeListener*/{
     View view;
     private RequestQueue mQueue;
     private RecyclerView recipeRecycler;
@@ -67,8 +71,10 @@ public class Recipes extends Fragment {
     private LinearLayout volleyError;
     private TextView volleyErrorText;
     private TextView priorityList;
+ //   private TextView calorieText;
     private ConstraintLayout timeout;
     private ConstraintLayout loading;
+    private TableRow calorieTable;
     private Button refresh;
     //  private Button priority;
     private ImageView priorityButton;
@@ -86,6 +92,9 @@ public class Recipes extends Fragment {
         refresh = view.findViewById(R.id.refresh);
         // priority=view.findViewById(R.id.priority);
         loading = view.findViewById(R.id.loading);
+      //  calorieText=view.findViewById(R.id.calorieText);
+      //  calorieTable=view.findViewById(R.id.calorieTable);
+       // calorieTable.setOnClickListener(listener);
         recipeRecycler = view.findViewById(R.id.recipe_recycler);
         volleyError = view.findViewById(R.id.volleyError);
         volleyErrorText = view.findViewById(R.id.volleyErrorText);
@@ -99,6 +108,8 @@ public class Recipes extends Fragment {
         checkTimeout();//count to 10 seconds and if content isnt loaded offer user a refresh button and tell em to turn internet on
         loadData();//get data from shared prefs
         prepareData();//get everything formatted right and stuff
+
+
         return view;
     }
 
@@ -107,6 +118,7 @@ public class Recipes extends Fragment {
             String formatedIngredients = getIngredientString();//Gets a ",+" formatted + concatenated string from user's storage items
             String url = getUrl(formatedIngredients);
             getRecipes(url);
+            Log.d("TAG", "URL is: "+url);
             empty.setVisibility(View.INVISIBLE);
         } else {//No items in storage
             loading.setVisibility(View.INVISIBLE);
@@ -114,6 +126,8 @@ public class Recipes extends Fragment {
             Log.d("TAG", "No items found!");
         }
     }
+
+
 
     private void checkTimeout() {
         final Handler handler = new Handler(Looper.getMainLooper());
@@ -160,6 +174,9 @@ public class Recipes extends Fragment {
                     //get
                     Log.d("TAG", "Prioritising almost expired stuff: " + prioritise);
                     break;
+          /*      case R.id.calorieTable:
+                    showNumberPicker(view);
+                    break;*/
             }
         }
     };
@@ -194,7 +211,7 @@ public class Recipes extends Fragment {
         String ingredientName = "";//This holds all the ingredients concatenated
         String formatedIngredients = "";
         if (prioritise) {//if user wants to prioritise results on items expiring soon, send the data off to get checked
-            // formatedIngredients ="";   //todo remove this boy
+
             try {
                 //Get the current date
                 Calendar calendar = Calendar.getInstance();//make new calendar and set its date to now
@@ -255,9 +272,10 @@ public class Recipes extends Fragment {
         String ranking = "&ranking=";
         int rankingNumber = 2;//1 = maximise used ingredients. 2= minimise ingredients that are missing
         String ingredientsAre = "&ingredients=";
+        String calories="&maxCalories=";
         //    formatedIngredients;
         String apiKey = "&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
-        return urlStart + resultNumber + ranking + rankingNumber + ingredientsAre + formatedIngredients + apiKey;
+        return urlStart + resultNumber + ranking + rankingNumber + ingredientsAre + formatedIngredients /*+calories+maxCalories*/+apiKey;
     }
 
     private void getRecipes(String url) {
@@ -334,7 +352,7 @@ public class Recipes extends Fragment {
                             volleyError.setVisibility(View.VISIBLE);
                             volleyErrorText.setText("Oh no, please try the action again.\n" +
                                     "If the problem persists drop me an email at \ncjr555@york.ac.uk\nPlease include this error code: " + errorCode);
-                                //todo when submitting remove my name here
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -351,6 +369,27 @@ public class Recipes extends Fragment {
         super.onPause();
         //    saveData();
     }
+/*
+    int maxCalories=2000;
+    @Override
+    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+        maxCalories=i;
+        calorieText.setText("Max Calories: "+maxCalories);
+
+        recipeRecycler.setVisibility(View.INVISIBLE);
+       loading.setVisibility(View.VISIBLE);
+        mRecipeList = new ArrayList<>();
+        loadData();
+        prepareData();
+        mAdapter.notifyDataSetChanged();
+    //    Log.d("TAG", "onValueChange: "+mRecipeList.get(0).getTitle());
+        Toast.makeText(getContext(),"Max Calories Set: "+maxCalories, Toast.LENGTH_SHORT).show();
+    }
+    public void showNumberPicker(View view){
+        NumberPickerDialog newFragment = new NumberPickerDialog();
+        newFragment.setValueChangeListener(this);
+        newFragment.show(getFragmentManager(), "time picker");
+    }*/
 }
 
 
