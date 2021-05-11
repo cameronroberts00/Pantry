@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     PendingIntent pendingIntent;
     AlarmManager alarmManager;
     BroadcastReceiver mReceiver;
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,12 +57,11 @@ public class MainActivity extends AppCompatActivity {
         frameLayout = (FrameLayout) findViewById(R.id.frame);
         progressLayout = (FrameLayout) findViewById(R.id.progressFrame);
 
-       checkAlarm();//check if user has had a daily notification already, if not, queue it up
+        checkAlarm();//check if user has had a daily notification already, if not, queue it up
 
         loadFrag(new Home());//load home frag
         loadProgress(new ProgressBar());//Load progressbar into top frame
 
-      //  startAlarm();
         //   getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         final BottomNavigationView btmn = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
@@ -113,85 +113,77 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-       // super.onBackPressed();
+        // super.onBackPressed();
         //backspace - use navbuttons or inbuilt nav
     }
 
+    //Notification management
+    //NotifyService class and alarm broadcasting in MainActivity with help from https://stackoverflow.com/questions/29058179/android-app-with-daily-notification
+
     //Check if user has had daily alarm yet
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void checkAlarm(){
-            //Get current time right now as separate calendar so we can compare it to the last day recorded to see if we need notification
-            Calendar rightNow = Calendar.getInstance();
-            //rightNow.setTimeInMillis(System.currentTimeMillis());
-           int currentDay= rightNow.get(Calendar.DAY_OF_MONTH);
+    private void checkAlarm() {
+        //Get current time right now as separate calendar so we can compare it to the last day recorded to see if we need notification
+        Calendar rightNow = Calendar.getInstance();
+        int currentDay = rightNow.get(Calendar.DAY_OF_MONTH);
 
-           //Calendar used to schedule notification alarm
-
-
+        //Get the last day recorded (this is already sorted for us in the Home.java)
         SharedPreferences settings = Objects.requireNonNull(this).getSharedPreferences("PREFS", 0);
         int lastDay = settings.getInt("day", 0);
-        Log.d("TAG", lastDay+" "+currentDay);
-        if (lastDay!= currentDay) {//Run only once per day
-        registerAlarmBroadcast();
-        setAlarm();
-        }else{
+
+       // Log.d("TAG", lastDay + " " + currentDay);
+
+        if (lastDay != currentDay) {//Run only once per day. If the last recorded day is not today, then register and set an alarm broadcast
+            registerAlarmBroadcast();
+            setAlarm();
+        } else {
             Log.d("TAG", "Alarm already set or has triggered daily notification already");
         }
 
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void setAlarm(){
+    private void setAlarm() {
+        int randomTime= ThreadLocalRandom.current().nextInt(12, 18 );//alarm between 12:00 and 18:00
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 20);
-        // calendar.set(Calendar.HOUR_OF_DAY, 21);
-        // calendar.set(Calendar.MINUTE,8);
-        //   alarmManager.set( AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10 , pendingIntent );
-        //   if (calendar.before(rightNow)) {//Make sure the notification is in the future, if it isnt, it becomes tomorrows notification (for example user is on app after 6pm)
-        //      calendar.add(Calendar.DAY_OF_YEAR, 1);
-        //   }
+        //calendar.add(Calendar.SECOND, 20);
+        calendar.set(Calendar.HOUR_OF_DAY, randomTime);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
 
-        //    if(!alarmSet) {//if an alarm hasnt been set, set one
-        // alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
         //output to console if a succesful alarm was set
         boolean alarmSet = (PendingIntent.getBroadcast(getApplicationContext(), 0,
                 new Intent("com.pantry.alarm"),
                 PendingIntent.FLAG_NO_CREATE) != null);
         Log.d("TAG", "Alarm Set: " + String.valueOf(alarmSet) + "\nNotification broadcast will happen at: " + calendar.getTime());
-
-        //}
     }
 
-    //--- Notification timing/alarm stuff past this point ---
-    //NotifyService class and alarm broadcasting in MainActivity with help from https://stackoverflow.com/questions/29058179/android-app-with-daily-notification
-    private void registerAlarmBroadcast()
-    {
+    private void registerAlarmBroadcast() {
         Log.d("TAG", "Registering alarm broadcast");
-        mReceiver = new BroadcastReceiver()
-        {
+        mReceiver = new BroadcastReceiver() {
             @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                Log.d("TAG","Alarm time reached");
+            public void onReceive(Context context, Intent intent) {//called when alarm has finished
+                Log.d("TAG", "Alarm time reached");
 
                 PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0,
-                        new Intent(getApplicationContext(), NotifyService.class),
+                        new Intent(getApplicationContext(), NotifyService.class),//go to notify service class and handle sending of notification
                         PendingIntent.FLAG_UPDATE_CURRENT);
                 try {
                     pendingIntent.send(getApplicationContext(), 0, intent);
-                    Log.d("TAG","NotifyService opened");
+                    Log.d("TAG", "NotifyService opened");
                 } catch (PendingIntent.CanceledException e) {
-                    Log.d("TAG","Couldn't load NotifyService!");
+                    Log.d("TAG", "Couldn't load NotifyService!");
                     e.printStackTrace();
                 }
-           }
+            }
         };
         // register the alarm broadcast
-        registerReceiver(mReceiver, new IntentFilter("com.pantry.alarm") );
-        pendingIntent = PendingIntent.getBroadcast( this, 0, new Intent("com.pantry.alarm"),0 );
-        alarmManager = (AlarmManager)(this.getSystemService( Context.ALARM_SERVICE ));
+        registerReceiver(mReceiver, new IntentFilter("com.pantry.alarm"));
+        pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent("com.pantry.alarm"), 0);
+        alarmManager = (AlarmManager) (this.getSystemService(Context.ALARM_SERVICE));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

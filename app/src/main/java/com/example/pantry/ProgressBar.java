@@ -39,10 +39,14 @@ public class ProgressBar extends Fragment {
     //Ints + their default values (not initialised as that would overide user save on app open)
     int currentInt;//=0;
     int nextInt;//=1;
+    int pointIncrement = 20;//how big of a jump is made when incrementing points
+    int steps = 100 / pointIncrement;//how many "steps" to get to 100% completion. in this case. 100/20=5. steps is used to show user how many items to save before a levelup
+
     private int mProgressStatus;//=0;
     Button okay;
     TextView bigLevel;
     TextView longLevel;
+    TextView hint;
     TinyDB tinyDB;
 
     @Override
@@ -53,6 +57,7 @@ public class ProgressBar extends Fragment {
         mProgressBar = view.findViewById(R.id.progressbar);
         currentLevel = view.findViewById(R.id.currentLevel);
         nextLevel = view.findViewById(R.id.nextLevel);
+        hint = view.findViewById(R.id.hint);
 
         /*Set the custom styles*/
         Drawable draw = getResources().getDrawable(R.drawable.custom_progress);
@@ -64,17 +69,26 @@ public class ProgressBar extends Fragment {
         currentInt = tinyDB.getInt("currentLevel");
         nextInt = tinyDB.getInt("nextLevel");
         mProgressStatus = tinyDB.getInt("status");
+
         //If the next achievable level comes back as 0 (default val), then this is app's first launch, set it to 1
         if (nextInt == 0) {
             nextInt = 1;
-            //TODO trigger a call to a tutorial here
         }
         //Display current stats to user
         currentLevel.setText(String.valueOf(currentInt));
         nextLevel.setText(String.valueOf(nextInt));
         mProgressBar.setProgress(mProgressStatus);
 
+        updateHint();
         return view;
+    }
+
+    private void updateHint() {
+        int hintNumber = steps - mProgressStatus / pointIncrement;
+        hint.setText("Save " + hintNumber + " more item");
+        if (steps - mProgressStatus / pointIncrement != 1) {//if more than 1 item, add on an s
+            hint.append("s");
+        }
     }
 
     //When called, this func increments the leveller by a point and levels the user up if required
@@ -84,13 +98,13 @@ public class ProgressBar extends Fragment {
             @Override
             public void run() {
                 // if (mProgressStatus < 100) {//Uncomment to loop the levelling infinitely
-                mProgressStatus = mProgressStatus + 20;
+                mProgressStatus = mProgressStatus + pointIncrement;
                 SystemClock.sleep(50);//sleep a lil bit
                 mHandler.post(new Runnable() {//Open another thread, this time it updates the progress bar
                     @Override
                     public void run() {
                         mProgressBar.setProgress(mProgressStatus);
-
+                        updateHint();
                     }
                 });
                 //  }
@@ -108,7 +122,7 @@ public class ProgressBar extends Fragment {
                             mProgressStatus = 0;
                             mProgressBar.setProgress(mProgressStatus);
                             triggerPopup();
-
+                            hint.setText("You did it!");
                             save();//save progress on every levelup
 
                         }
@@ -181,6 +195,7 @@ public class ProgressBar extends Fragment {
                                 super.onAnimationEnd(animation);
                                 popupWindow.setExitTransition(new Slide());
                                 popupWindow.dismiss();
+                                updateHint();
                             }
                         });
 
