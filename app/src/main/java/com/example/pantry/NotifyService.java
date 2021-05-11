@@ -36,10 +36,10 @@ public class NotifyService extends IntentService {
     //2arrays to hold notification title and content, to be selected below using int randomIndex
 String []notificationTitle={
     //Title of notification
-    "Will you save some food today?","No action is too small.","Is your storeroom up to date?","Did you know?","Did you know?","What's cooking?","Needing inspiration?"};
+    "Is your storeroom page up to date?","Will you save some food today?","No action is too small.","Is your storeroom up to date?","Did you know?","Did you know?","What's cooking?","Needing inspiration?"};
     String []notificationContent={
     //Content of Notification
-    "Check out some recipes to see what you can make!","Read some of our food waste tips to see how you can make a difference today!","Add more items to your storeroom now to get relevant recipes and track dates easily!","On average, a typical UK household will lose £250-£400 per year due to food waste.","6.6 million tonnes of food is wasted every year in the UK.","Check out the recipe page to see what you can make!","See what you can make next in the recipes page!"};
+    "Use the barcode scanner or add items manually to keep your storeroom up to date. An accurate storeroom helps find relevant recipes!","Check out some recipes to see what you can make!","Read some of our food waste tips to see how you can make a difference today!","Add more items to your storeroom now to get relevant recipes and track dates easily!","On average, a typical UK household will lose £250-£400 per year due to food waste.\nSee what you can make with the recipes page now!","6.6 million tonnes of food is wasted every year in the UK.\nSee what you can create on the recipes page to help reduce this number!","Check out the recipe page to see what you can make!","See what you can make next in the recipes page!"};
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void showNotification() {

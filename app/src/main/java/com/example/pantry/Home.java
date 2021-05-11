@@ -2,6 +2,7 @@ package com.example.pantry;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.AlarmManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -244,7 +245,7 @@ tutorialHint.setVisibility(View.GONE);
                                     Log.d("TAG", "Failed in date function! " + e);
 
                                 }
-                                featureRandom(jsonArray, random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0
+                                featureRandom(jsonArray, random);//Calls a function that removes a random tip from the array/recyclers so it be displayed bigger to encourage user to click and read. send int random with  value of 0 as default
 
                                 //this for loop iterates the array and accesses all the attributes of each individual item
                                 for (int i = 0; jsonArray.length() > i; i++) {
@@ -294,7 +295,7 @@ tutorialHint.setVisibility(View.GONE);
                 editor.putInt("random", random);
                 editor.commit();
             }
-            Log.d("TAG", "String caught for removal" + jsonArray.getString(random));
+            Log.d("TAG", "String for featured" + jsonArray.getString(random));
 
             //take the entries attributes and store them in seperate fields
             JSONObject childObject = jsonArray.getJSONObject(random);
