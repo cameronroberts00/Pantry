@@ -272,7 +272,7 @@ public class Recipes extends Fragment /*implements NumberPicker.OnValueChangeLis
         String ranking = "&ranking=";
         int rankingNumber = 2;//1 = maximise used ingredients. 2= minimise ingredients that are missing
         String ingredientsAre = "&ingredients=";
-        String calories="&maxCalories=";
+        //String calories="&maxCalories=";
         //    formatedIngredients;
         String apiKey = "&apiKey=c3fd51aacc404bf4b88e83bdca4c5f11";
         return urlStart + resultNumber + ranking + rankingNumber + ingredientsAre + formatedIngredients /*+calories+maxCalories*/+apiKey;

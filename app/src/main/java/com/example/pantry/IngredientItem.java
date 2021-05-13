@@ -22,6 +22,4 @@ public class IngredientItem {
     public String getBestByDate() {
         return mBestbyDate;
     }
-
-
 }

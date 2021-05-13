@@ -91,7 +91,7 @@ public class Storeroom extends Fragment {
     private void isEmpty() {
         if (mIngredientList.size() <= 0) {
             Log.d("TAG", "Nothing in storeroom!");
-            //TODO load graphic that shows its empty
+
             emptyContainer.setVisibility(View.VISIBLE);
         }
     }

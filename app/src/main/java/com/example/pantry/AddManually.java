@@ -1,48 +1,34 @@
 package com.example.pantry;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDialogFragment;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.CountDownTimer;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -51,7 +37,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class AddManually extends Fragment {
     View view;
-    private static final String TAG = "MainActivity";
     Button submitDate;
     Button back;
     EditText nameText;
@@ -115,8 +100,8 @@ public class AddManually extends Fragment {
                     break;
                 case R.id.back:
                     //return back to prev activ
-                    AddRecipe addRecipe = new AddRecipe();
-                    Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame, addRecipe).addToBackStack(null).commit();
+                    AddIngredient addIngredient = new AddIngredient();
+                    Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame, addIngredient).addToBackStack(null).commit();
                     break;
             }
         }
@@ -128,7 +113,7 @@ public class AddManually extends Fragment {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // get date from string
             bestByDate = data.getStringExtra("selectedDate");
-            Log.d(TAG, "Manual input item recorded as:\nProduct Name: " + name + "\nCategory: " + category + "\nBest by date:" + bestByDate);
+            Log.d("TAG", "Manual input item recorded as:\nProduct Name: " + name + "\nCategory: " + category + "\nBest by date:" + bestByDate);
 
             insertItem(name, category, bestByDate);//this starts the save process by adding items to array list
             showSave();//this just shows "Saved!"

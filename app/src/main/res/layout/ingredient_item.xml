@@ -9,32 +9,32 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp">
+        android:layout_height="160dp">
 
         <Button
             android:id="@+id/deleteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/expired"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
             android:layout_marginStart="7dp"
             android:layout_marginLeft="7dp"
-            android:layout_marginBottom="7dp"
+            android:layout_marginTop="0dp"
             android:text="item binned"
+
             app:backgroundTint="@color/errorCodeRed"
             app:cornerRadius="20dp"
-
             app:iconPadding="4dp" />
 
         <Button
             android:id="@+id/savedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_alignTop="@+id/deleteButton"
+            android:layout_marginTop="0dp"
             android:layout_marginEnd="14dp"
             android:layout_marginRight="7dp"
-            android:layout_marginBottom="7dp"
             android:layout_toStartOf="@+id/colour_indicator"
             android:layout_toLeftOf="@+id/colour_indicator"
             android:text="Item saved"
@@ -63,12 +63,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/product_bestby"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
             android:text="EXPIRED"
             android:textColor="@color/errorCodeRed"
-            android:textSize="15sp"
-            tools:visibility="gone" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/product_name"
@@ -90,8 +89,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/product_name"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
             android:text="Product Category"
             android:textSize="15sp" />
 
@@ -100,8 +101,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/product_category"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
             android:text="Product Best by date"
             android:textSize="15sp" />
     </RelativeLayout>

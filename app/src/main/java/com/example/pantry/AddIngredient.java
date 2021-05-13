@@ -57,13 +57,11 @@ import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 
-//This class is made with help from TinyDB to store some data in shared preferences, find docs here:
-//https://tinydb.readthedocs.io/en/latest/
 
 //Barcode scanning in this class is made with help from:
 //https://medium.com/analytics-vidhya/creating-a-barcode-scanner-using-android-studio-71cff11800a2
 
-public class AddRecipe extends Fragment {
+public class AddIngredient extends Fragment {
     View view;
     private SurfaceView surfaceView;
     private BarcodeDetector barcodeDetector;
@@ -88,7 +86,7 @@ public class AddRecipe extends Fragment {
     private String category;
     private int bestby;//This is used to define how many days the product should last. that is then added to a custom Date
     private String bestByDate;//i turn date into string so i can save, it goes here.
-    TinyDB tinyDB;
+    //TinyDB tinyDB;
     private RequestQueue mQueue;
     String url;//This is the full url concatenated from the below
     String urlStart = "https://chompthis.com/api/v2/food/branded/barcode.php?api_key=";
@@ -119,7 +117,7 @@ public class AddRecipe extends Fragment {
         mQueue = Volley.newRequestQueue(getActivity());
         //product=new JSONObject();
         // products=new JSONArray();
-        tinyDB = new TinyDB(getContext());
+       // tinyDB = new TinyDB(getContext());
         productInfo.setVisibility(View.GONE);//hide, this will appear when product is actually found
         initialiseDetectorsAndSources();
         loadData();
@@ -183,6 +181,7 @@ public class AddRecipe extends Fragment {
             case "CONDIMENT":
             case "SAUCE":
             case "SALAD CREAM":
+            case "NUTS":
                 bestby = 180;
                 getDate(bestby);
                 category = categoryUppercased;
@@ -201,10 +200,16 @@ public class AddRecipe extends Fragment {
             case "FLOUR":
             case "SUGAR":
             case "HONEY":
+            case "ALCOHOL":
+            case "OIL":
+            case "SPICE":
+            case "SALT":
+            case "PEPPER":
+            case "SEASONING":
             case "CEREAL":
             case "COFFEE":
+            case "CAFE":
             case "TEA":
-            case "NUTS":
                 bestby = 365;
                 getDate(bestby);
                 category = categoryUppercased;
@@ -311,7 +316,6 @@ public class AddRecipe extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void addManually() {//launches the add manually fragment
-        //TODO start manually adding fraggy
         Log.d("TAG", "snosig");
         AddManually addManually = new AddManually();
         Objects.requireNonNull(getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frame, addManually).addToBackStack(null).commit();

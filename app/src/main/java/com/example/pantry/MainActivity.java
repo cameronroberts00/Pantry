@@ -15,27 +15,17 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import com.google.android.material.bottomappbar.BottomAppBar;
-import com.google.android.material.bottomnavigation.BottomNavigationMenu;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.bottomnavigation.LabelVisibilityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
 
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static java.security.AccessController.getContext;
 
 //This class has navigation components and frag loading
 public class MainActivity extends AppCompatActivity {
@@ -92,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadFrag(new AddRecipe());
+                loadFrag(new AddIngredient());
                 btmn.getMenu().findItem(R.id.empty).setChecked(true);//Move the checked status onto the empty spacing-aid button to deselect the 4 "normal" menu items.
             }
         });
