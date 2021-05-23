@@ -47,7 +47,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
     public CardView recipeContainer;
     public Button addToShopping;
     private ImageView heart;
-    boolean isHearted=false;
+   // boolean isHearted=false;
     private RequestQueue mQueue, mQueue2;
     public ArrayList<ShoppingListItem> mShoppingList;
     public String image;//(this is image address sent as string to the shopping list for missing items)
@@ -60,7 +60,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
 
         public ViewHolder(View itemView) {
             super(itemView);
-            //todo declare textviews and container here
             recipeTitle = itemView.findViewById(R.id.title);
             recipeImage = itemView.findViewById(R.id.imageView);
             missedIngredients = itemView.findViewById(R.id.missingText);

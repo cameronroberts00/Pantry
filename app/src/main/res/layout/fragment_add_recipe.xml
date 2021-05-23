@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
-                tools:visibility="visible">
+                tools:visibility="invisible">
 
                 <LinearLayout
                     android:id="@+id/product_info"
@@ -101,7 +101,8 @@
                 android:id="@+id/action_buttons"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                tools:visibility="invisible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -169,9 +170,9 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
-            android:layout_width="0dp"
+            android:layout_width="400dp"
 
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_marginStart="32dp"
             android:layout_marginLeft="32dp"
             android:layout_marginTop="8dp"

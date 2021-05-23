@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.transition.Explode;
 import android.transition.Slide;
 import android.util.Log;
@@ -28,8 +30,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 
-//Progress bar uses the TinyDB class to help save stuff to shared prefs
-//https://tinydb.readthedocs.io/en/latest/
+
 public class ProgressBar extends Fragment {
     private android.widget.ProgressBar mProgressBar;
     private Handler mHandler = new Handler();
@@ -47,7 +48,7 @@ public class ProgressBar extends Fragment {
     TextView bigLevel;
     TextView longLevel;
     TextView hint;
-    TinyDB tinyDB;
+    SharedPreferences preferences;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,12 +64,11 @@ public class ProgressBar extends Fragment {
         Drawable draw = getResources().getDrawable(R.drawable.custom_progress);
         mProgressBar.setProgressDrawable(draw);
 
-        tinyDB = new TinyDB(getContext());
-
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         //Retrieve user data
-        currentInt = tinyDB.getInt("currentLevel");
-        nextInt = tinyDB.getInt("nextLevel");
-        mProgressStatus = tinyDB.getInt("status");
+        currentInt=preferences.getInt("currentLevel",0);
+        nextInt=preferences.getInt("nextLevel",0);
+        mProgressStatus=preferences.getInt("status",0);
 
         //If the next achievable level comes back as 0 (default val), then this is app's first launch, set it to 1
         if (nextInt == 0) {
@@ -78,6 +78,7 @@ public class ProgressBar extends Fragment {
         currentLevel.setText(String.valueOf(currentInt));
         nextLevel.setText(String.valueOf(nextInt));
         mProgressBar.setProgress(mProgressStatus);
+
 
         updateHint();
         return view;
@@ -139,9 +140,13 @@ public class ProgressBar extends Fragment {
     }
 
     public void save() {
-        tinyDB.putInt("status", mProgressStatus);
-        tinyDB.putInt("currentLevel", currentInt);
-        tinyDB.putInt("nextLevel", nextInt);
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("status",mProgressStatus);
+        editor.putInt("currentLevel",currentInt);
+        editor.putInt("nextLevel",nextInt);
+        editor.apply();
+
         Log.d("TAG",
                 "Save status:\n" + "progress status: " + mProgressStatus + "\n" +
                         "current level: " + currentInt + "\n" +
