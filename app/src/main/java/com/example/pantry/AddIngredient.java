@@ -413,18 +413,9 @@ public class AddIngredient extends Fragment {
                         @Override
                         public void run() {
                             if (!scanOnce) {
-                                if (barcodes.valueAt(0).email != null) {
-                                    barcodeText.removeCallbacks(null);
-                                    barcodeData = barcodes.valueAt(0).email.address;
-                                    // barcodeText.setText(barcodeData);
-                                    Log.d("barcode", "run: " + barcodeData);
-                                    toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
-                                } else {
                                     barcodeData = barcodes.valueAt(0).displayValue;
-                                    //   barcodeText.setText(barcodeData);
                                     Log.d("barcode", "run: " + barcodeData);
                                     toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
-                                }
                                 //Send data to the API function
                                 urlBarcode = barcodeData;
                                 Log.d("barcode", "Barcode registered as " + urlBarcode);
