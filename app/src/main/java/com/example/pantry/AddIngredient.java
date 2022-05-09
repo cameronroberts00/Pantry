@@ -405,7 +405,7 @@ public class AddIngredient extends Fragment {
             public void release() {
             }
 
-            @Override
+            @Override//when barcode has been scanned, this is called.
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
